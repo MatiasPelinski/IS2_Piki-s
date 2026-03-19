@@ -1,5 +1,4 @@
 # Ing_Software2
-Dentro de este repo vamos a estar solucionando un problema respecto al control de stock de un ferretería como si se trabajara en un entorno profesional.
 
 Nombre del grupo: Piki's
 Nombre del proyecto: Stockeado
@@ -10,9 +9,9 @@ Link al tablero de Kanban: https://github.com/users/MatiasPelinski/projects/2/vi
 
 *No entendi el link al último reporte semanal subido al campus*
 
-| Nombre             | Rol           | GitHub       |
-|--------------------|--------------|--------------|
-| Victoria Espíndola | Scrum Master | *Completar*   |
-| Matías Pelinski    | Dev Lead     | @matiasruiz  |
-| Lisandro Mieres    | QA Lead      | *Completar*   |
-| Emilia Auras       | UX Lead      | *Completar*      |
+| Nombre             | Rol          | GitHub          |
+|--------------------|--------------|-----------------|
+| Victoria Espíndola | Scrum Master | *Completar*     |
+| Matías Pelinski    | Dev Lead     | @MatiasPelinski |
+| Lisandro Mieres    | QA Lead      | *Completar*     |
+| Emilia Auras       | UX Lead      | *Completar*     |
