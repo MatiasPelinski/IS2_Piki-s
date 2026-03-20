@@ -12,6 +12,6 @@ Link al tablero de Kanban: https://github.com/users/MatiasPelinski/projects/2
 | Nombre             | Rol          | GitHub          |
 |--------------------|--------------|-----------------|
 | Victoria Espinola | Scrum Master | *Completar*     |
-| Matías Pelinski    | Dev Lead     | @MatiasPelinski |
-| Lisandro Mieres    | QA Lead      | *Completar*     |
+| Matías Pelinski    | QA Lead     | @MatiasPelinski |
+| Lisandro Mieres    | Dev Lead      | @LisandroMieres |
 | Emilia Auras       | UX Lead      | *Completar*     |
