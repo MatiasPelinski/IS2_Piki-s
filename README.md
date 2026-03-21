@@ -1,4 +1,4 @@
-# Ing_Software2
+# Piki's-is2/
 
 Nombre del grupo: Piki's
 Nombre del proyecto: Stockeado
