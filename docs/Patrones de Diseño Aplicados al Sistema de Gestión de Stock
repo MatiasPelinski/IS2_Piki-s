@@ -6,31 +6,33 @@ identificados en el dominio de la ferretería. El objetivo es garantizar
 que el sistema sea escalable, mantenible y desacoplado, mitigando los
 riesgos críticos detectados en la matriz de riesgos del negocio.
 
-Patrones Implementados
+
+Patrones Implementados:
 Actualmente, el sistema utiliza los siguientes patrones de comportamiento:
 
 Observer: Para la gestión automática de alertas de stock mínimo.
 
 Strategy: Para el procesamiento diferenciado de movimientos de mercadería.
 
+
 1. Patrón Observer (Observador)
-Descripción General
+-Descripción General
 Define una relación de dependencia de uno a muchos. Cuando el objeto principal
 (Subject) cambia su estado, notifica a sus dependientes (Observers) para que
 se actualicen automáticamente.
 
-Problema que resuelve
+-Problema que resuelve
 Evita el acoplamiento fuerte entre la clase Producto y la clase Alerta.
 Sin este patrón, Producto debería conocer la existencia de Alerta para
 avisarle cuando el stock es bajo, violando el principio Open/Closed.
 
-Aplicación en el Sistema
-Contexto de elección
+-Aplicación en el Sistema
+--Contexto de elección:
 Se elige este patrón para resolver la dependencia entre la actualización
 del stock y la generación de alertas, garantizando la notificación
 inmediata de eventos sin comprometer la integridad de la clase Producto.
 
-Uso específico del patrón
+--Uso específico del patrón
 Sujeto (Subject): La clase Producto. Mantiene la lista de observadores
 y los notifica cada vez que su atributo stockActual se modifica.
 
@@ -41,28 +43,26 @@ Extensibilidad: Permite registrar nuevos observadores en tiempo de
 ejecución sin alterar el código de la lógica de negocio principal.
 
 2. Patrón Strategy (Estrategia)
-Descripción General
+-Descripción General
 Encapsula una familia de algoritmos en clases independientes y los hace
 intercambiables en tiempo de ejecución, permitiendo que el comportamiento
 varíe según el contexto.
 
-Problema que resuelve
+-Problema que resuelve
 Elimina el uso de condicionales complejos (if/else o switch) dentro de la
 lógica de movimientos. Centralizar estas variaciones en un solo método
 incrementa el riesgo de registros incorrectos y dificulta las pruebas.
 
-Aplicación en el Sistema
-Contexto de elección
+-Aplicación en el Sistema
+Contexto de elección:
 Se selecciona para mitigar el riesgo de "registro incorrecto de entradas
 y salidas". Al aislar la lógica de cada movimiento, se garantiza que
 los errores en una estrategia no afecten el funcionamiento de las demás.
 
 Uso específico del patrón
-Interfaz EstrategiaMovimiento: Define el contrato único con el
+--Interfaz EstrategiaMovimiento: Define el contrato único con el
 método ejecutar(producto, cantidad).
-
-Estrategias Concretas: Clases EstrategiaEntrada, EstrategiaSalida
+--Estrategias Concretas: Clases EstrategiaEntrada, EstrategiaSalida
 y EstrategiaAjuste. Cada una encapsula su propia lógica aritmética.
-
-Contexto de Ejecución: La clase MovimientoStock delega la tarea a
+--Contexto de Ejecución: La clase MovimientoStock delega la tarea a
 la estrategia inyectada, facilitando el mantenimiento futuro.
