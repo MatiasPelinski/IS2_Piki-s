@@ -1,49 +1,68 @@
-
 Patrones de Diseño Aplicados al Sistema de Gestión de Stock
-
 Introducción
-La selección de patrones en este proyecto responde a problemas concretos identificados en el dominio de la ferretería. El objetivo es garantizar que el sistema sea escalable, mantenible y desacoplado, mitigando los riesgos críticos detectados en la matriz de riesgos del negocio.
 
- Patrones Implementados
+La selección de patrones en este proyecto responde a problemas concretos
+identificados en el dominio de la ferretería. El objetivo es garantizar
+que el sistema sea escalable, mantenible y desacoplado, mitigando los
+riesgos críticos detectados en la matriz de riesgos del negocio.
+
+Patrones Implementados
 Actualmente, el sistema utiliza los siguientes patrones de comportamiento:
-1. Observer: Para la gestión automática de alertas de stock mínimo.
-2. Strategy: Para el procesamiento diferenciado de movimientos de mercadería.
 
+Observer: Para la gestión automática de alertas de stock mínimo.
 
+Strategy: Para el procesamiento diferenciado de movimientos de mercadería.
 
 1. Patrón Observer (Observador)
+Descripción General
+Define una relación de dependencia de uno a muchos. Cuando el objeto principal
+(Subject) cambia su estado, notifica a sus dependientes (Observers) para que
+se actualicen automáticamente.
 
-### Descripción General
-Define una relación de dependencia de uno a muchos. Cuando el objeto principal (Subject) cambia su estado, notifica a sus dependientes (Observers) para que se actualicen automáticamente.
+Problema que resuelve
+Evita el acoplamiento fuerte entre la clase Producto y la clase Alerta.
+Sin este patrón, Producto debería conocer la existencia de Alerta para
+avisarle cuando el stock es bajo, violando el principio Open/Closed.
 
- Problema que resuelve
-Evita el acoplamiento fuerte entre la clase Producto y la clase Alerta. Sin este patrón, Producto debería conocer la existencia de Alerta para avisarle cuando el stock es bajo. Si en el futuro se requiriera enviar un correo electrónico o crear una orden de compra automática, habría que modificar la clase Producto constantemente, violando el principio Open/Closed.
-
- Aplicación en el Sistema
-
+Aplicación en el Sistema
 Contexto de elección
-Se elige este patrón para resolver la dependencia entre la actualización del stock y la generación de alertas. Dado que el riesgo de "definición incorrecta de stock mínimo" impacta directamente en la operación, se requiere un mecanismo que garantice la notificación inmediata de eventos sin comprometer la integridad de la clase Producto.
+Se elige este patrón para resolver la dependencia entre la actualización
+del stock y la generación de alertas, garantizando la notificación
+inmediata de eventos sin comprometer la integridad de la clase Producto.
 
 Uso específico del patrón
---Sujeto (Subject): La clase Producto actúa como el objeto observado. Contiene una lista de observadores y dispara el método de notificación cada vez que su atributo `stockActual` se ve afectado por un movimiento.
---Observadores (Observers):Se implementa la interfaz `ObservadorStock`. La clase `Alerta` actúa como un observador concreto que, al ser notificado, ejecuta la lógica de validación frente al stock mínimo.
---Extensibilidad: El sistema permite registrar nuevos observadores (como reposición automática o logs) en tiempo de ejecución sin alterar el código fuente de la lógica de negocio principal.
+Sujeto (Subject): La clase Producto. Mantiene la lista de observadores
+y los notifica cada vez que su atributo stockActual se modifica.
 
- 2. Patrón Strategy (Estrategia)
+Observadores (Observers): Se implementa la interfaz ObservadorStock.
+La clase Alerta reacciona validando el stock actual frente al mínimo.
 
- Descripción General
-Encapsula una familia de algoritmos en clases independientes y los hace intercambiables en tiempo de ejecución. Permite que el comportamiento de un objeto varíe según el contexto sin alterar su estructura interna.
+Extensibilidad: Permite registrar nuevos observadores en tiempo de
+ejecución sin alterar el código de la lógica de negocio principal.
 
- Problema que resuelve
-Elimina el uso de estructuras condicionales complejas (if/else o switch) dentro de la lógica de movimientos. En el contexto de una ferretería, una Entrada, una Salida y un Ajuste de stock requieren lógicas de cálculo distintas. Centralizar estas variaciones en un solo método incrementa el riesgo de registros incorrectos y dificulta las pruebas unitarias.
+2. Patrón Strategy (Estrategia)
+Descripción General
+Encapsula una familia de algoritmos en clases independientes y los hace
+intercambiables en tiempo de ejecución, permitiendo que el comportamiento
+varíe según el contexto.
 
- Aplicación en el Sistema
+Problema que resuelve
+Elimina el uso de condicionales complejos (if/else o switch) dentro de la
+lógica de movimientos. Centralizar estas variaciones en un solo método
+incrementa el riesgo de registros incorrectos y dificulta las pruebas.
 
- Contexto de elección
-Se selecciona este patrón para mitigar el riesgo de "registro incorrecto de entradas y salidas de stock". Al aislar la lógica de cálculo de cada tipo de movimiento en clases separadas, se garantiza que los errores en una estrategia (por ejemplo, un ajuste) no afecten el funcionamiento de las otras (ventas o compras).
+Aplicación en el Sistema
+Contexto de elección
+Se selecciona para mitigar el riesgo de "registro incorrecto de entradas
+y salidas". Al aislar la lógica de cada movimiento, se garantiza que
+los errores en una estrategia no afecten el funcionamiento de las demás.
 
- Uso específico del patrón
---Interfaz EstrategiaMovimiento: Define el contrato único con el método `ejecutar(producto, cantidad)`.
---Estrategias Concretas: Se desarrollan las clases `EstrategiaEntrada` (incremento), `EstrategiaSalida` (decremento) y `EstrategiaAjuste` (reemplazo). Cada una encapsula su propia lógica aritmética.
---Contexto de Ejecución: La clase `MovimientoStock` no contiene lógica de cálculo; en su lugar, posee una referencia a la interfaz. Al procesar un movimiento, delega la tarea a la estrategia que se le haya inyectado, facilitando el mantenimiento y la incorporación de nuevos tipos de movimientos mercantes.
+Uso específico del patrón
+Interfaz EstrategiaMovimiento: Define el contrato único con el
+método ejecutar(producto, cantidad).
 
+Estrategias Concretas: Clases EstrategiaEntrada, EstrategiaSalida
+y EstrategiaAjuste. Cada una encapsula su propia lógica aritmética.
+
+Contexto de Ejecución: La clase MovimientoStock delega la tarea a
+la estrategia inyectada, facilitando el mantenimiento futuro.
