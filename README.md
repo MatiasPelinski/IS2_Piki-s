@@ -17,4 +17,8 @@ Link al tablero de Kanban: https://github.com/users/MatiasPelinski/projects/2
 
 <img width="1320" height="800" alt="image" src="https://github.com/user-attachments/assets/5bc9769f-32e4-431a-a98e-0b1aa2b3e5d0" />
 
+Sistema de Gestión de Inventario y Reposición de Stock
+
 <img width="361" height="567" alt="image" src="https://github.com/user-attachments/assets/191cd90d-e99b-4ed9-bb30-d94498c8abe6" />
+
+Este módulo de backend se encarga de la administración centralizada de productos, el control de existencias en tiempo real y la automatización de pedidos a proveedores. El sistema permite registrar cada movimiento de mercadería asociado a un usuario, garantizando la trazabilidad y la generación de alertas automáticas cuando los niveles de stock son críticos.
