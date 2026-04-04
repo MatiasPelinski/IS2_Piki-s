@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — Ferretería</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h1>Sistema de Inventario</h1>
+                <p>Bienvenido, <strong>{{ nombre }}</strong> — {{ rol }}</p>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Cerrar sesión</a>
+        </div>
+
+        <div class="dashboard-menu">
+            <a href="{{ url_for('productos') }}" class="menu-card">
+                <span class="menu-icon">📦</span>
+                <span>Productos</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
