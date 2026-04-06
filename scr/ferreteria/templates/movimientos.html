@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Movimientos — FerreteriaStock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">FerreteriaStock</div>
+        <div class="navbar-user">
+            <span>{{ nombre }}</span>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                <i data-feather="sun" class="icon-sun"></i>
+                <i data-feather="moon" class="icon-moon"></i>
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-sm">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-sm">Salir</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-title">
+            <h2>Movimientos de stock</h2>
+            <p>Registrá entradas, salidas y ajustes del inventario</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Registrar movimiento</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('registrar_movimiento') }}">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Producto</label>
+                            <select name="id_producto" required>
+                                <option value="">Seleccioná un producto</option>
+                                {% for p in productos %}
+                                    <option value="{{ p.id }}">{{ p.nombre }} (Stock: {{ p.stock_actual }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de movimiento</label>
+                            <select name="tipo" required>
+                                <option value="">Seleccioná el tipo</option>
+                                <option value="entrada">Entrada — suma stock</option>
+                                <option value="salida">Salida — resta stock</option>
+                                <option value="ajuste">Ajuste — establece valor exacto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" name="cantidad" required min="1" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Motivo</label>
+                            <input type="text" name="motivo" required placeholder="Ej: Venta al cliente, Compra a proveedor...">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrar movimiento</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Últimos 50 movimientos</div>
+            <div class="card-body p-0">
+                {% if movimientos %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Motivo</th>
+                            <th>Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in movimientos %}
+                        <tr>
+                            <td>{{ m.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td><strong>{{ m.producto_nombre }}</strong></td>
+                            <td>
+                                {% if m.tipo == 'entrada' %}
+                                    <span class="badge badge-success">Entrada</span>
+                                {% elif m.tipo == 'salida' %}
+                                    <span class="badge badge-danger">Salida</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Ajuste</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ m.cantidad }}</td>
+                            <td>{{ m.motivo }}</td>
+                            <td>{{ m.usuario_nombre }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <div class="empty-state">No hay movimientos registrados todavía.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+        const html = document.documentElement;
+        const saved = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', saved);
+        updateThemeIcon(saved);
+
+        function toggleTheme() {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.querySelector('.icon-sun');
+            const moonIcon = document.querySelector('.icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+                moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
