@@ -1,7 +1,3 @@
-Acá tenés el **Contrato de Proyecto** redactado en base a toda la información que tengo del sistema.
-
----
-
 # CONTRATO DE PROYECTO
 
 ## Sistema de Gestión de Inventario para Ferretería — "Stockeado"
@@ -240,8 +236,3 @@ Al firmar este contrato, los integrantes del equipo acuerdan:
 
 ---
 
-Este documento puede ser modificado por acuerdo unánime del equipo. Cualquier cambio debe ser documentado en el acta correspondiente.
-
----
-
-¿Necesitás que modifique algún campo, agregue más secciones o ajuste el formato?
