@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Importar Excel — FerreteriaStock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">FerreteriaStock</div>
+        <div class="navbar-user">
+            <span>{{ nombre }}</span>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                <i data-feather="sun" class="icon-sun"></i>
+                <i data-feather="moon" class="icon-moon"></i>
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-sm">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-sm">Salir</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-title">
+            <h2>Importar Excel de proveedor</h2>
+            <p>Cargá el archivo enviado por el proveedor para actualizar el stock automáticamente</p>
+        </div>
+
+        <!-- Formulario de carga de archivo -->
+        <div class="card">
+            <div class="card-header">Subir archivo</div>
+            <div class="card-body">
+                <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+                    El archivo debe ser un Excel (.xlsx) con las columnas:
+                    <strong>Proveedor, Fecha, Producto, Cantidad, Precio Unitario, Total</strong>
+                </p>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="upload-area">
+                        <i data-feather="upload-cloud" class="upload-icon"></i>
+                        <p>Seleccioná el archivo Excel del proveedor</p>
+                        <input type="file" name="archivo" accept=".xlsx" required class="upload-input">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 16px;">
+                        Procesar archivo
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resultados de productos ya procesados automáticamente -->
+        {% if resultados %}
+        <div class="card">
+            <div class="card-header" style="background: #f0fdf4; color: #15803d;">
+                ✅ Productos actualizados automáticamente
+            </div>
+            <div class="card-body p-0">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Proveedor</th>
+                            <th>Cantidad ingresada</th>
+                            <th>Stock nuevo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in resultados %}
+                        <tr>
+                            <td><strong>{{ r.producto }}</strong></td>
+                            <td>{{ r.proveedor }}</td>
+                            <td><span class="badge badge-success">+{{ r.cantidad }}</span></td>
+                            <td>{{ r.stock_nuevo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Productos no encontrados - el encargado decide qué hacer con TODOS de una sola vez -->
+        {% if productos_con_similares %}
+        <div class="card">
+            <div class="card-header card-header-warning">
+                ⚠️ Productos no encontrados - Seleccioná una opción para cada uno
+            </div>
+            <div class="card-body">
+                <p style="margin-bottom: 16px;">
+                    Los siguientes productos no coincidieron automáticamente con ningún producto existente.
+                    Seleccioná para cada uno si querés <strong>vincularlo a un producto existente</strong> o <strong>crearlo como nuevo</strong>.
+                </p>
+                
+                <form method="POST" action="{{ url_for('importar') }}" id="formDecisiones">
+                    <input type="hidden" name="procesar_todos" value="1">
+                    
+                    {% for p in productos_con_similares %}
+                    <div style="border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: var(--surface);">
+                        <h3 style="margin-bottom: 12px; color: var(--warning);">📦 {{ p.nombre }}</h3>
+                        <p style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted);">
+                            Proveedor: {{ p.proveedor }} | Cantidad a ingresar: <strong>+{{ p.cantidad }}</strong> | Fecha: {{ p.fecha }}
+                        </p>
+                        
+                        <input type="hidden" name="cantidad_{{ p.nombre }}" value="{{ p.cantidad }}">
+                        <input type="hidden" name="proveedor_{{ p.nombre }}" value="{{ p.proveedor }}">
+                        <input type="hidden" name="fecha_{{ p.nombre }}" value="{{ p.fecha }}">
+                        
+                        <div style="margin-top: 12px;">
+                            <label style="font-weight: 600; margin-right: 20px; display: inline-flex; align-items: center;">
+                                <input type="radio" name="accion_{{ p.nombre }}" value="crear" checked style="width: 18px; height: 18px; margin-right: 8px;">
+                                ✨ Crear nuevo producto "{{ p.nombre }}"
+                            </label>
+                            
+                            {% if p.similares %}
+                            <label style="font-weight: 600; display: inline-flex; align-items: center;">
+                                <input type="radio" name="accion_{{ p.nombre }}" value="vincular" style="width: 18px; height: 18px; margin-right: 8px;">
+                                🔗 Vincular a:
+                                <select name="accion_{{ p.nombre }}_select" disabled style="margin-left: 10px; min-width: 200px;" class="select-vincular">
+                                    <option value="">Seleccioná un producto</option>
+                                    {% for similar in p.similares %}
+                                    <option value="vincular_{{ similar.id }}">{{ similar.nombre }} {% if similar.categoria_nombre %}({{ similar.categoria_nombre }}){% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            {% else %}
+                            <div style="margin-top: 8px; color: var(--text-muted); font-size: 0.85rem;">
+                                ℹ️ No hay productos similares en el sistema. Solo podés crear este producto.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button type="submit" class="btn btn-primary">Procesar todos los productos</button>
+                        <a href="{{ url_for('importar') }}" class="btn btn-outline">Cancelar</a>
+                    </div>
+                </form>
+                
+                <div class="alert alert-info" style="margin-top: 20px;">
+                    💡 <strong>¿Cómo funciona?</strong><br>
+                    • Seleccioná "Crear nuevo" para productos que nunca se registraron en el sistema.<br>
+                    • Seleccioná "Vincular a" para productos que ya existen con otro nombre.<br>
+                    • Hacé clic en "Procesar todos" para aplicar TODAS las decisiones de una sola vez.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if errores %}
+        <div class="card">
+            <div class="card-header card-header-danger">Errores</div>
+            <div class="card-body">
+                {% for error in errores %}
+                    <div class="alert alert-danger" style="margin-bottom: 8px;">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Guía de uso (solo cuando no hay nada procesado) -->
+        {% if not productos_con_similares and not resultados and not errores %}
+        <div class="card">
+            <div class="card-header">📖 ¿Cómo funciona?</div>
+            <div class="card-body">
+                <ol style="margin-left: 20px; color: var(--text-muted); line-height: 1.6;">
+                    <li>Subí el archivo Excel que te envía el proveedor</li>
+                    <li>Los productos que ya existen en el sistema se actualizan automáticamente ✅</li>
+                    <li>Los productos nuevos se muestran en una lista</li>
+                    <li>Para cada producto nuevo, elegí si CREARLO o VINCULARLO a uno existente</li>
+                    <li>Hacé clic en "Procesar todos" para aplicar todas las decisiones de una sola vez</li>
+                </ol>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        feather.replace();
+        const html = document.documentElement;
+        const saved = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', saved);
+        updateThemeIcon(saved);
+
+        function toggleTheme() {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.querySelector('.icon-sun');
+            const moonIcon = document.querySelector('.icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+                moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+            }
+        }
+
+        // Habilitar/deshabilitar select de vinculación según radio button
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const container = this.closest('div[style*="border: 1px solid"]');
+                const select = container.querySelector('.select-vincular');
+                if (select) {
+                    if (this.value === 'vincular') {
+                        select.disabled = false;
+                    } else {
+                        select.disabled = true;
+                        select.value = '';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

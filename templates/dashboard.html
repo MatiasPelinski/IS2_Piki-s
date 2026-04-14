@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — FerreteriaStock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}?v=2">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">FerreteriaStock</div>
+        <div class="navbar-user">
+            <span>{{ nombre }}</span>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                <i data-feather="sun" class="icon-sun"></i>
+                <i data-feather="moon" class="icon-moon"></i>
+            </button>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-sm">Salir</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-title">
+            <h2>Panel principal</h2>
+            <p>Resumen del sistema de inventario</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card stat-blue">
+                <i data-feather="package" class="stat-icon"></i>
+                <div class="stat-number">{{ total_productos }}</div>
+                <div class="stat-label">Productos activos</div>
+            </div>
+            <div class="stat-card stat-orange">
+                <i data-feather="bell" class="stat-icon"></i>
+                <div class="stat-number">{{ total_alertas }}</div>
+                <div class="stat-label">Alertas activas</div>
+            </div>
+            <div class="stat-card {% if total_reponer > 0 %}stat-red{% else %}stat-green{% endif %}">
+                <i data-feather="{% if total_reponer > 0 %}alert-triangle{% else %}check-circle{% endif %}" class="stat-icon"></i>
+                <div class="stat-number">{{ total_reponer }}</div>
+                <div class="stat-label">Productos a reponer</div>
+                
+                {% if total_reponer > 0 %}
+                    <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.9;">¡Requiere atención!</div>
+                {% else %}
+                    <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8;">Stock óptimo</div>
+                {% endif %}
+            </div>
+            <div class="stat-card stat-green">
+                <i data-feather="activity" class="stat-icon"></i>
+                <div class="stat-number">{{ movimientos_hoy }}</div>
+                <div class="stat-label">Movimientos hoy</div>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <a href="{{ url_for('productos') }}" class="menu-card">
+                <i data-feather="package" class="menu-card-icon"></i>
+                <div class="menu-card-title">Productos</div>
+                <div class="menu-card-desc">Registrá y consultá el inventario</div>
+            </a>
+            <a href="{{ url_for('movimientos') }}" class="menu-card">
+                <i data-feather="repeat" class="menu-card-icon"></i>
+                <div class="menu-card-title">Movimientos</div>
+                <div class="menu-card-desc">Entradas, salidas y ajustes de stock</div>
+            </a>
+            <a href="{{ url_for('alertas') }}" class="menu-card">
+                <i data-feather="bell" class="menu-card-icon"></i>
+                <div class="menu-card-title">Alertas y reposición</div>
+                <div class="menu-card-desc">Productos con stock bajo</div>
+            </a>
+            {% if rol == 'encargado' %}
+            <a href="{{ url_for('importar') }}" class="menu-card">
+                <i data-feather="upload" class="menu-card-icon"></i>
+                <div class="menu-card-title">Importar Excel</div>
+                <div class="menu-card-desc">Cargá facturas de proveedores</div>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+        const html = document.documentElement;
+        const saved = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', saved);
+        updateThemeIcon(saved);
+
+        function toggleTheme() {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.querySelector('.icon-sun');
+            const moonIcon = document.querySelector('.icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+                moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+            }
+        }
+
+        // --- AGREGÁ ESTO PARA EL ATAJO F2 ---
+        document.addEventListener('keydown', function(event) {
+            // Detecta si se presiona la tecla F2
+            if (event.key === 'F2') {
+                event.preventDefault(); // Evita que el navegador haga otra cosa
+                alert("¡Se activó la Venta Rápida con F2! (Próximamente abriremos el panel aquí)");
+            }
+        });
+        // ------------------------------------
+    </script>
+</body>
+</html>
