@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — FerreteriaStock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+<body>
+   <nav class="navbar">
+        <div class="navbar-brand">FerreteriaStock</div>
+        
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">Búsqueda rápida de productos</div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('productos') }}" class="search-form">
+                    <div class="search-grid">
+                        <div class="form-group">
+                            <input type="text" name="busqueda" placeholder="Buscar por nombre...">
+                        </div>
+                        <div class="form-group">
+                            <select name="categoria">
+                                <option value="">Todas las categorías</option>
+                                {% for cat in categorias %}
+                                    <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Buscar</button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="navbar-user">
+            <span>{{ nombre }}</span>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                <i data-feather="sun" class="icon-sun"></i>
+                <i data-feather="moon" class="icon-moon"></i>
+            </button>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-sm">Salir</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="page-title">
+            <h2>Panel principal</h2>
+            <p>Resumen del sistema de inventario</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card stat-blue">
+                <i data-feather="package" class="stat-icon"></i>
+                <div class="stat-number">{{ total_productos }}</div>
+                <div class="stat-label">Productos activos</div>
+            </div>
+            <div class="stat-card stat-orange">
+                <i data-feather="bell" class="stat-icon"></i>
+                <div class="stat-number">{{ total_alertas }}</div>
+                <div class="stat-label">Alertas activas</div>
+            </div>
+            <div class="stat-card stat-red">
+                <i data-feather="alert-triangle" class="stat-icon"></i>
+                <div class="stat-number">{{ total_reponer }}</div>
+                <div class="stat-label">Productos a reponer</div>
+            </div>
+            <div class="stat-card stat-green">
+                <i data-feather="activity" class="stat-icon"></i>
+                <div class="stat-number">{{ movimientos_hoy }}</div>
+                <div class="stat-label">Movimientos hoy</div>
+            </div>
+        </div>
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">Búsqueda rápida de productos</div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('productos') }}" class="search-form">
+                    <div class="search-grid">
+                        <div class="form-group">
+                            <input type="text" name="busqueda" placeholder="Buscar por nombre...">
+                        </div>
+                        <div class="form-group">
+                            <select name="categoria">
+                                <option value="">Todas las categorías</option>
+                                {% for cat in categorias %}
+                                    <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Buscar</button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+         
+        <div class="menu-grid">
+            <a href="{{ url_for('productos') }}" class="menu-card">
+                <i data-feather="package" class="menu-card-icon"></i>
+                <div class="menu-card-title">Productos</div>
+                <div class="menu-card-desc">Registrá y consultá el inventario</div>
+            </a>
+            <a href="{{ url_for('movimientos') }}" class="menu-card">
+                <i data-feather="repeat" class="menu-card-icon"></i>
+                <div class="menu-card-title">Movimientos</div>
+                <div class="menu-card-desc">Entradas, salidas y ajustes de stock</div>
+            </a>
+            <a href="{{ url_for('alertas') }}" class="menu-card">
+                <i data-feather="bell" class="menu-card-icon"></i>
+                <div class="menu-card-title">Alertas y reposición</div>
+                <div class="menu-card-desc">Productos con stock bajo</div>
+            </a>
+            {% if rol == 'encargado' %}
+            <a href="{{ url_for('importar') }}" class="menu-card">
+                <i data-feather="upload" class="menu-card-icon"></i>
+                <div class="menu-card-title">Importar Excel</div>
+                <div class="menu-card-desc">Cargá facturas de proveedores</div>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+        const html = document.documentElement;
+        const saved = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', saved);
+        updateThemeIcon(saved);
+
+        function toggleTheme() {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.querySelector('.icon-sun');
+            const moonIcon = document.querySelector('.icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+                moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
