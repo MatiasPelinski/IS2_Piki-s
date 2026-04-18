@@ -332,6 +332,33 @@ Relaciones innecesarias (include/extend)
   Diseña la interfaz de usuario, mejora la experiencia de uso y asegura la coherencia visual del sistema.
 
 ---
+## Entrada 012 — Semana 3
+
+**Fecha:** 18/04/2026
+**Herramienta:** Claude (Anthropic) — claude.ai
+**Responsable:** Scrum Master — Victoria Espínola
+**Eje temático:** Eje 3 — HCI y Sistemas Críticos
+
+**¿Para qué se usó?**
+Desarrollar el análisis completo de estándares de validación de sistemas (HCI y sistemas críticos) requerido por la consigna del Eje 3.
+
+**¿Qué generó la IA?**
+Documento completo `ANALISIS_ESTANDARES.md` con investigación de ISO 9241-11, ISO 13407, ISO/IEC 27001, ISA/IEC 62443 e ISO 9001; tabla comparativa; análisis aplicado al escenario de ferretería; conclusión sobre certificación; y tabla de relación entre decisiones de diseño del TP1 y los estándares.
+
+**¿Qué aceptamos tal cual?**
+- Estructura general del documento
+- Descripción técnica de cada estándar
+- Tabla comparativa con los 5 estándares
+- Análisis de relevancia por escenario
+- Conclusión sobre ISO/IEC 27001 como estándar a certificar
+- Tabla de relación con patrones Observer y Strategy del TP1
+
+**¿Qué modificamos y por qué?**
+Se verificó la coherencia con las decisiones reales del TP1 (patrones implementados, estructura de base de datos, roles de usuario) para asegurar que el análisis refleje el sistema real del grupo y no uno genérico.
+
+**¿Qué descartamos y por qué?**
+Referencias a estándares fuera de la consigna y ejemplos de otros dominios no aplicables al escenario de ferretería.
+---
 
 ## Resumen de entradas
 
@@ -348,5 +375,5 @@ Relaciones innecesarias (include/extend)
 | 009 | 5 | Eje 2 | Excel |
 | 010 | 5 | Eje 2 | Roles |
 | 011 | 5 | Eje 3 | Casos de uso |
-
+| 012 | 6 | Eje 3 | Análisis de estándares HCI y sistemas críticos |
 ---
