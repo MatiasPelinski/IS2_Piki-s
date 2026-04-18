@@ -149,21 +149,6 @@ A continuación se analiza cómo cada decisión de diseño tomada en el TP1 faci
 
 Si el equipo tuviera que certificar el sistema Stockeado bajo un estándar actual, elegiría **ISO/IEC 27001** como objetivo de certificación principal. Esta elección se fundamenta en que es el estándar que implicaría los cambios más estructurales y, por lo tanto, el que mayor valor agregaría al sistema desde una perspectiva de madurez técnica y confianza operacional. Los cambios concretos que requeriría la certificación son: reemplazar el almacenamiento de contraseñas en texto plano por hashing con sal (bcrypt o werkzeug.security); externalizar la `secret_key` de Flask a variables de entorno; implementar transacciones atómicas explícitas en todas las operaciones de escritura múltiple; hacer inmutables los registros del historial de movimientos; y agregar registro de eventos de acceso en una tabla de auditoría independiente. En términos de patrones, el **Observer** favorece el cumplimiento al permitir extender el mecanismo de notificación para emitir eventos de seguridad sin alterar la lógica central, y el **Strategy** facilita la auditoría independiente de cada tipo de operación, alineándose con el principio de integridad de datos que la norma exige.
 
----
 
-## 6. Registro de Uso de IA (AI_LOG)
-
-| **Campo** | **Detalle** |
-|---|---|
-| **Herramienta** | Claude (Anthropic) — claude.ai |
-| **Responsable** | Scrum Master — Victoria Espínola |
-| **Fecha** | Abril 2026 |
-| **Eje temático** | Eje 3 — HCI y Sistemas Críticos |
-| **Prompt utilizado** | Solicitud de desarrollo completo de la consigna "Estándares en validación de sistemas – De HCI clásico a seguridad en sistemas críticos", incluyendo investigación de los 5 estándares, análisis aplicado al sistema de ferretería, tabla comparativa, conclusión sobre certificación y relación entre decisiones de diseño del TP1 y los estándares. |
-| **¿Qué se aceptó?** | Estructura general, descripción técnica de cada estándar, tabla comparativa, análisis de relevancia, conclusión sobre ISO/IEC 27001 y tabla de relación con patrones de diseño. |
-| **¿Qué se modificó?** | Se verificó la coherencia con las decisiones reales del TP1 (patrones, estructura de BD, roles) para asegurar que el análisis refleje el sistema real del grupo. |
-| **¿Qué se descartó?** | Referencias a estándares fuera de la consigna y ejemplos de otros dominios no aplicables al escenario de ferretería. |
-
----
 
 *IS II · UCP Inc. · Eje 3 — HCI y Sistemas Críticos · 2026*
