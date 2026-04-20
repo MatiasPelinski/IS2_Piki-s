@@ -1,124 +1,139 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alertas — FerreteriaStock</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Manrope:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=9">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">FerreteriaStock</div>
-        <div class="navbar-user">
-            <span>{{ nombre }}</span>
-            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
-                <i data-feather="sun" class="icon-sun"></i>
-                <i data-feather="moon" class="icon-moon"></i>
-            </button>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-sm">Dashboard</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-sm">Salir</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="page-title">
-            <h2>Alertas y reposición</h2>
-            <p>Productos con stock bajo y listado de reposición</p>
-        </div>
-
-        <div class="card">
-            <div class="card-header card-header-danger">Alertas activas</div>
-            <div class="card-body p-0">
-                {% if alertas %}
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Stock actual</th>
-                            <th>Stock mínimo</th>
-                            <th>Mensaje</th>
-                            <th>Fecha</th>
-                            {% if rol == 'encargado' %}<th>Acción</th>{% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for a in alertas %}
-                        <tr class="row-danger">
-                            <td><strong>{{ a.producto_nombre }}</strong></td>
-                            <td><span class="badge badge-danger">{{ a.stock_actual }}</span></td>
-                            <td>{{ a.stock_minimo }}</td>
-                            <td>{{ a.mensaje }}</td>
-                            <td>{{ a.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
-                            {% if rol == 'encargado' %}
-                            <td>
-                                <a href="{{ url_for('resolver_alerta', id=a.id) }}" class="btn btn-outline-sm">Resolver</a>
-                            </td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                    <div class="empty-state empty-state-success">No hay alertas activas. El inventario está en orden.</div>
-                {% endif %}
+    
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                FERRETERIASTOCK
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header card-header-warning">Listado de productos a reponer</div>
-            <div class="card-body p-0">
-                {% if productos_reponer %}
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Stock actual</th>
-                            <th>Stock mínimo</th>
-                            <th>Cantidad a reponer</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in productos_reponer %}
-                        <tr>
-                            <td><strong>{{ p.nombre }}</strong></td>
-                            <td>{{ p.categoria_nombre or '—' }}</td>
-                            <td><span class="badge badge-danger">{{ p.stock_actual }}</span></td>
-                            <td>{{ p.stock_minimo }}</td>
-                            <td><span class="badge badge-warning">{{ p.stock_minimo - p.stock_actual }} unidades</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                    <div class="empty-state empty-state-success">No hay productos que necesiten reposición.</div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <i data-feather="grid"></i> Panel Principal
+                </a>
+                <a href="{{ url_for('productos') }}" class="sidebar-link">
+                    <i data-feather="package"></i> Inventario
+                </a>
+                <a href="{{ url_for('movimientos') }}" class="sidebar-link">
+                    <i data-feather="repeat"></i> Movimientos
+                </a>
+                <a href="{{ url_for('alertas') }}" class="sidebar-link" style="color: var(--primary); background-color: var(--surface-container-highest);">
+                    <i data-feather="bell"></i> Alertas y Stock
+                </a>
+                {% if rol == 'encargado' %}
+                <a href="{{ url_for('importar') }}" class="sidebar-link">
+                    <i data-feather="database"></i> Reportes Excel
+                </a>
                 {% endif %}
+                {% if session.get('rol') == 'admin' %}
+                <a href="{{ url_for('gestion_usuarios') }}" class="sidebar-link">
+                    <i data-feather="users"></i> Gestión de Personal
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <span style="font-family: 'Manrope'; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">USUARIO: {{ session['usuario_nombre'] }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-tertiary" style="color: var(--error); border-color: var(--error);">SALIR</a>
+           <button class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
+                    <i data-feather="sun" class="icon-sun"></i>
+                    <i data-feather="moon" class="icon-moon"></i>
+                </button>
+            </header>
+
+            <div class="container">
+                <div class="page-title" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; color: var(--error);">CENTRO DE ALERTAS</h2>
+                        <p style="color: var(--text-muted); font-family: 'Manrope'; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;">Monitoreo de quiebres de stock y reposición crítica</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--error); letter-spacing: 0.1em; display: block; margin-bottom: 5px;">ESTADO DEL SISTEMA</span>
+                        <span style="font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700; color: var(--on-surface);">REQUIERE ATENCIÓN</span>
+                    </div>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--error);">
+                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; color: var(--on-surface); margin-bottom: 1.5rem; text-transform: uppercase;">
+                        <i data-feather="alert-triangle" style="color: var(--error); margin-right: 10px; vertical-align: middle;"></i>
+                        Artículos por debajo del mínimo
+                    </h3>
+
+                    {% if alertas and alertas|length > 0 %}
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: var(--surface); font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                                <th style="padding: 1rem; text-align: left;">SKU / Artículo</th>
+                                <th style="padding: 1rem; text-align: center;">Stock Mínimo Ideal</th>
+                                <th style="padding: 1rem; text-align: center;">Stock Físico Actual</th>
+                                <th style="padding: 1rem; text-align: right;">Déficit (A reponer)</th>
+                                <th style="padding: 1rem; text-align: center;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alerta in alertas %}
+                            <tr style="border-bottom: 2px solid var(--surface); transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='var(--surface-container-highest)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 1.5rem 1rem; font-family: 'Inter'; font-weight: 700;">{{ alerta.nombre|upper }}</td>
+                                
+                                <td style="padding: 1.5rem 1rem; text-align: center; font-family: 'Space Grotesk'; color: var(--text-muted);">
+                                    {{ alerta.stock_minimo }}
+                                </td>
+                                
+                                <td style="padding: 1.5rem 1rem; text-align: center;">
+                                    <span style="background-color: rgba(255, 84, 73, 0.1); color: var(--error); padding: 0.5rem 1rem; font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem;">
+                                        {{ alerta.stock_actual }}
+                                    </span>
+                                </td>
+                                
+                                <td style="padding: 1.5rem 1rem; text-align: right; font-family: 'Space Grotesk'; font-weight: 700; color: var(--primary); font-size: 1.2rem;">
+                                    -{{ alerta.stock_minimo - alerta.stock_actual }}
+                                </td>
+                                
+                                <td style="padding: 1.5rem 1rem; text-align: center;">
+                                    <a href="{{ url_for('movimientos', producto_id=alerta.id) }}" class="btn-tertiary" style="font-size: 0.7rem; padding: 0.5rem 1rem; color: var(--primary); border-color: var(--primary);">REGISTRAR INGRESO</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div style="padding: 4rem 2rem; text-align: center; background-color: var(--surface);">
+                        <i data-feather="check-circle" style="color: var(--tertiary-cyan); width: 64px; height: 64px; margin-bottom: 1.5rem; opacity: 0.5;"></i>
+                        <h4 style="font-family: 'Space Grotesk'; font-size: 1.5rem; color: var(--on-surface); margin-bottom: 0.5rem;">SISTEMA ESTABILIZADO</h4>
+                        <p style="font-family: 'Manrope'; color: var(--tertiary-cyan); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Ningún artículo se encuentra por debajo del umbral mínimo de seguridad.</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-        </div>
+        </main>
     </div>
-
-    <script>
+<script>
+        // 1. Cargar los íconos visuales
         feather.replace();
-        const html = document.documentElement;
-        const saved = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', saved);
-        updateThemeIcon(saved);
 
+        // 2. Lógica del Tema (Súper limpia)
+        const html = document.documentElement;
+        // Leemos la memoria, si está vacía, usamos el Monolito Oscuro
+        const saved = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', saved);
+
+        // 3. Función del botón
         function toggleTheme() {
             const current = html.getAttribute('data-theme');
             const next = current === 'light' ? 'dark' : 'light';
+            
             html.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
-            updateThemeIcon(next);
-        }
-
-        function updateThemeIcon(theme) {
-            const sunIcon = document.querySelector('.icon-sun');
-            const moonIcon = document.querySelector('.icon-moon');
-            if (sunIcon && moonIcon) {
-                sunIcon.style.display = theme === 'light' ? 'block' : 'none';
-                moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
-            }
         }
     </script>
 </body>

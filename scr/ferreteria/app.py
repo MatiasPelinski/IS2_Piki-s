@@ -13,58 +13,38 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
-@app.route('/login', methods=['GET', 'POST'])
+# ─── LOGIN ───────────────────────────────────────────────
+@app.route('/', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        
-        # 1. Usamos TU método de conexión exacto
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
-        # 2. Pedimos la columna 'rol'
-        cursor.execute('SELECT id, nombre, email, rol FROM usuarios WHERE email = %s AND password = %s', (email, password))
+        cursor.execute(
+            'SELECT * FROM usuarios WHERE email = %s AND password = %s AND activo = 1',
+            (email, password)
+        )
         usuario = cursor.fetchone()
-        
-        # 3. Cerramos la conexión para liberar memoria (Buena práctica)
         cursor.close()
         conn.close()
-        
         if usuario:
-            # 4. Guardamos las credenciales usando TUS nombres de variables
             session['usuario_id'] = usuario['id']
             session['usuario_nombre'] = usuario['nombre']
-            session['usuario_email'] = usuario['email']
-            
-            # Guardamos el rol en ambas variables para que funcione tanto tu Dashboard 
-            # como el nuevo módulo de Gestión de Personal que armamos
             session['usuario_rol'] = usuario['rol']
-            session['rol'] = usuario['rol'] 
-            
-            flash(f"Acceso concedido. Rango operativo: {usuario['rol'].upper()}", "success")
             return redirect(url_for('dashboard'))
         else:
-            flash("Credenciales inválidas. Acceso denegado.", "error")
-            
-    return render_template('login.html')
-
-# ─── LOGIN ───────────────────────────────────────────────
+            error = 'Email o contraseña incorrectos.'
+    return render_template('login.html', error=error)
 
 # ─── DASHBOARD ───────────────────────────────────────────
 @app.route('/dashboard')
 def dashboard():
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
-        
-    # 1. Atrapamos los datos del buscador si el usuario escribió algo
-    busqueda = request.args.get('busqueda', '')
-    categoria_filtro = request.args.get('categoria', '')
-    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # 2. Consultas originales de estadísticas
     cursor.execute('SELECT COUNT(*) AS total FROM productos WHERE activo = 1')
     total_productos = cursor.fetchone()['total']
     cursor.execute('SELECT COUNT(*) AS total FROM alertas WHERE resuelta = 0')
@@ -73,47 +53,16 @@ def dashboard():
     total_reponer = cursor.fetchone()['total']
     cursor.execute('SELECT COUNT(*) AS total FROM movimientos_stock WHERE DATE(fecha) = CURDATE()')
     movimientos_hoy = cursor.fetchone()['total']
-    
-    # Obtenemos las categorías para que el selector funcione
-    cursor.execute('SELECT * FROM categorias WHERE activo = 1')
-    categorias = cursor.fetchall()
-    
-    # 3. LÓGICA NUEVA: Si hay una búsqueda, buscamos los productos
-    productos_busqueda = None
-    if busqueda or categoria_filtro:
-        query = '''
-            SELECT p.*, c.nombre AS categoria_nombre
-            FROM productos p
-            LEFT JOIN categorias c ON p.id_categoria = c.id
-            WHERE p.activo = 1
-        '''
-        params = []
-        if busqueda:
-            query += ' AND p.nombre LIKE %s'
-            params.append(f'%{busqueda}%')
-        if categoria_filtro:
-            query += ' AND p.id_categoria = %s'
-            params.append(categoria_filtro)
-            
-        query += ' ORDER BY p.nombre LIMIT 10' # Limitamos a 10 resultados para no romper el diseño del panel
-        
-        cursor.execute(query, params)
-        productos_busqueda = cursor.fetchall()
-
     cursor.close()
     conn.close()
-    
     return render_template('dashboard.html',
                            nombre=session['usuario_nombre'],
                            rol=session['usuario_rol'],
                            total_productos=total_productos,
                            total_alertas=total_alertas,
                            total_reponer=total_reponer,
-                           movimientos_hoy=movimientos_hoy,
-                           categorias=categorias,
-                           busqueda=busqueda,
-                           categoria_filtro=categoria_filtro,
-                           productos_busqueda=productos_busqueda)
+                           movimientos_hoy=movimientos_hoy)
+
 # ─── PRODUCTOS ───────────────────────────────────────────
 @app.route('/productos')
 def productos():
@@ -426,7 +375,7 @@ def importar():
                         'existe': True
                     })
                 else:
-                    # Productos no encontrados - buscar similares
+                    # Producto no encontrado - buscar similares
                     cursor.execute('''
                         SELECT id, nombre, 
                                (SELECT nombre FROM categorias WHERE id = p.id_categoria) AS categoria_nombre
@@ -556,46 +505,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
-@app.route('/usuarios', methods=['GET', 'POST'])
-def gestion_usuarios():
-    # 1. CERRADURA LÓGICA: Solo el ADMIN puede pisar esta zona
-    if session.get('rol') != 'admin':
-        flash("ACCESO DENEGADO: Requiere credenciales de Administrador.", "error")
-        return redirect(url_for('dashboard'))
-
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-    # 2. PROCESAMIENTO DE DATOS (Crear o Eliminar)
-    if request.method == 'POST':
-        if 'registrar' in request.form:
-            nombre = request.form['nombre']
-            email = request.form['email']
-            password = request.form['password'] # Nota: En un sistema final, esto debería ir encriptado
-            rol = request.form['rol']
-            
-            # Verificamos que el correo no exista ya
-            cursor.execute("SELECT id FROM usuarios WHERE email = %s", (email,))
-            if cursor.fetchone():
-                flash("ERROR: El correo ya está asignado a otro operario.", "error")
-            else:
-                cursor.execute('INSERT INTO usuarios (nombre, email, password, rol) VALUES (%s, %s, %s, %s)', 
-                               (nombre, email, password, rol))
-                mysql.connection.commit()
-                flash("Operario registrado exitosamente en el sistema.", "success")
-                
-        elif 'eliminar' in request.form:
-            id_eliminar = request.form['usuario_id']
-            # Evitamos que el admin se borre a sí mismo por accidente
-            if int(id_eliminar) == session.get('usuario_id'):
-                flash("PROTOCOLO DE SEGURIDAD: No puedes eliminar tu propio usuario.", "error")
-            else:
-                cursor.execute('DELETE FROM usuarios WHERE id = %s', (id_eliminar,))
-                mysql.connection.commit()
-                flash("Credenciales revocadas. Operario eliminado.", "error") # Usamos error para que salga en rojo
-
-    # 3. LECTURA DE DATOS
-    cursor.execute('SELECT id, nombre, email, rol FROM usuarios ORDER BY rol, nombre')
-    lista_usuarios = cursor.fetchall()
-    
-    return render_template('usuarios.html', usuarios=lista_usuarios)

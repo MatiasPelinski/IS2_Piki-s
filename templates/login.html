@@ -1,34 +1,61 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión — Ferretería</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5">
+    <title>Acceso al Sistema — El Monolito</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Manrope:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    <style>
+        .login-body::before {
+            background-image: url("{{ url_for('static', filename='img/img.png') }}") !important;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema — El Monolito</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Manrope:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
 </head>
 <body class="login-body">
+    
     <div class="login-wrapper">
         <div class="login-card">
-            <div class="login-logo">
-                <div class="logo-icon">F</div>
-                <h1>FerreteriaStock</h1>
-                <p>Sistema de gestión de inventario</p>
+            
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i data-feather="cpu" style="width: 32px; height: 32px;"></i>
+                </div>
+                <h2>FERRETERIASTOCK</h2>
+                <p>SISTEMA DE CONTROL DE INVENTARIO</p>
             </div>
+
             {% if error %}
-                <div class="alert alert-danger">{{ error }}</div>
+                <div class="alert-box">
+                    <i data-feather="alert-triangle"></i> {{ error }}
+                </div>
             {% endif %}
-            <form method="POST" class="login-form">
+
+            <form method="POST" action="{{ url_for('login') }}">
                 <div class="form-group">
-                    <label>Correo electrónico</label>
-                    <input type="email" name="email" required placeholder="correo@ferreteria.com">
+                    <label>IDENTIFICACIÓN DE USUARIO</label>
+                    <input type="email" name="email" required placeholder="INGRESE SU CORREO...">
                 </div>
                 <div class="form-group">
-                    <label>Contraseña</label>
+                    <label>CÓDIGO DE ACCESO</label>
                     <input type="password" name="password" required placeholder="••••••••">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Ingresar al sistema</button>
+                <button type="submit" class="btn-primary" style="width: 100%; height: 56px; margin-top: 1rem; font-size: 1rem;">INICIALIZAR SESIÓN</button>
             </form>
+            
         </div>
     </div>
+
+    <script>
+        feather.replace();
+    </script>
 </body>
 </html>
