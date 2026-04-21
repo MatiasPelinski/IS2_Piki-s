@@ -1,0 +1,326 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Manrope:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+/* =========================================
+   PALETA MODO CLARO (Por defecto)
+   ========================================= */
+:root, [data-theme="light"] {
+    --surface: #f1f5f9;
+    --surface-container-low: #e2e8f0;
+    --surface-container-highest: #cbd5e1;
+    --primary: #ea580c; /* Naranja más oscuro para que lea bien sobre blanco */
+    --primary-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --tertiary-cyan: #0284c7; /* Azul/Cian industrial oscuro */
+    --on-surface: #0f172a;
+    --text-muted: #64748b;
+    --error: #dc2626;
+    --radius-0: 0px; /* Regla inquebrantable del diseño */
+}
+
+/* =========================================
+   PALETA MODO OSCURO (The Kinetic Monolith)
+   ========================================= */
+[data-theme="dark"] {
+    --surface: #121416;
+    --surface-container-low: #1a1c1e;
+    --surface-container-highest: #282a2d;
+    --primary: #ffb692;
+    --primary-gradient: linear-gradient(135deg, #ffb692 0%, #ff6d00 100%);
+    --tertiary-cyan: #00e5ff;
+    --on-surface: #e2e2e6;
+    --text-muted: #9ea3ae;
+    --error: #ff5449;
+}
+
+/* =========================================
+   ESTRUCTURA BASE
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: var(--radius-0) !important;
+}
+
+body {
+    background-color: var(--surface);
+    color: var(--on-surface);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* =========================================
+   LAYOUT: BARRA LATERAL + CONTENIDO
+   ========================================= */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: var(--surface-container-low);
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s;
+}
+
+.sidebar-header {
+    padding: 2rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    background-color: var(--surface-container-highest);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    color: var(--on-surface);
+    text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-link:hover {
+    background-color: var(--surface-container-highest);
+    color: var(--primary);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background-color: var(--surface);
+    gap: 1.5rem;
+}
+
+.container {
+    padding: 0 3rem 3rem 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* =========================================
+   COMPONENTES
+   ========================================= */
+.card {
+    background-color: var(--surface-container-low);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-tertiary {
+    background: none;
+    border: 1px solid var(--text-muted);
+    color: var(--on-surface);
+    padding: 0.5rem 1rem;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background-color: var(--surface-container-low);
+    padding: 1.5rem
+    display: flex;
+    flex-direction: column;
+}
+
+.form-input {
+    width: 100%;
+    background-color: var(--surface);
+    border: none;
+    border-bottom: 2px solid var(--surface-container-highest);
+    padding: 1rem;
+    color: var(--on-surface);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+}
+.form-input:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+}
+/* =========================================
+   LOGIN INDUSTRIAL (The Kinetic Monolith)
+   ========================================= */
+.login-body {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--surface);
+    overflow: hidden;
+}
+
+/* Capa de fondo "HUD Avanzado" */
+.login-body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Si tenés una imagen JPG/PNG en tu carpeta static, poné la ruta acá: */
+    background-image: url('img/img.png');
+    background-size: cover;
+    background-position: center;
+    filter: blur(10px) brightness(0.25); /* Desenfoque y oscuridad máxima */
+    z-index: 1;
+}
+
+.login-wrapper {
+    position: relative;
+    z-index: 2; /* Flota sobre el fondo */
+    width: 100%;
+    max-width: 440px;
+    padding: 20px;
+}
+
+.login-card {
+    /* Fondo semitransparente para el efecto cristal */
+    background-color: rgba(26, 28, 30, 0.85); 
+    backdrop-filter: blur(20px); 
+    padding: 3rem;
+    border-top: 4px solid var(--primary); /* Acento de energía superior */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    /* Regla inquebrantable: 0px de radio */
+    border-radius: 0px !important; 
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.login-header .logo-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--surface-container-highest);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    border-radius: 0px;
+}
+
+.login-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--on-surface);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.7rem;
+    color: var(--tertiary-cyan);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.login-card .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.login-card label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.login-card input {
+    width: 100%;
+    background-color: var(--surface);
+    border: none;
+    border-bottom: 2px solid var(--surface-container-highest);
+    padding: 1rem;
+    color: var(--on-surface);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    transition: border-bottom-color 0.2s;
+    border-radius: 0px;
+}
+
+.login-card input:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+}
+
+.alert-box {
+    background-color: rgba(255, 84, 73, 0.1);
+    color: var(--error);
+    padding: 1rem;
+    margin-bottom: 2rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 4px solid var(--error);
+}
+/* =========================================
+   BOTÓN DE TEMA (Control de Estado)
+   ========================================= */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0 !important;
+    border-radius: 0px !important; /* Forzamos la regla del Monolito */
+}
+
+/* El CSS decide qué ícono mostrar, no el JavaScript */
+[data-theme="dark"] .icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: block; }
+
+[data-theme="light"] .icon-sun { display: block; }
+[data-theme="light"] .icon-moon { display: none; }

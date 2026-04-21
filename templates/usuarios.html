@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Personal — FerreteriaStock</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Manrope:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=10">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+<body>
+    
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                FERRETERIASTOCK
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <i data-feather="grid"></i> Panel Principal
+                </a>
+                <a href="{{ url_for('productos') }}" class="sidebar-link">
+                    <i data-feather="package"></i> Inventario
+                </a>
+                <a href="{{ url_for('movimientos') }}" class="sidebar-link">
+                    <i data-feather="repeat"></i> Movimientos
+                </a>
+                <a href="{{ url_for('alertas') }}" class="sidebar-link">
+                    <i data-feather="bell"></i> Alertas y Stock
+                </a>
+                {% if session.get('rol') in ['admin', 'encargado'] %}
+                <a href="{{ url_for('importar') }}" class="sidebar-link">
+                    <i data-feather="database"></i> Reportes Excel
+                </a>
+                {% endif %}
+                {% if session.get('rol') == 'admin' %}
+                <a href="{{ url_for('gestion_usuarios') }}" class="sidebar-link" style="color: var(--primary); background-color: var(--surface-container-highest);">
+                    <i data-feather="users"></i> Gestión de Personal
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <span style="font-family: 'Manrope'; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">ADMINISTRADOR: {{ session['usuario_nombre'] }}</span>
+                <button class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
+                    <i data-feather="sun" class="icon-sun"></i>
+                    <i data-feather="moon" class="icon-moon"></i>
+                </button>
+                <a href="{{ url_for('logout') }}" class="btn-tertiary" style="color: var(--error); border-color: var(--error);">SALIR</a>
+            </header>
+
+            <div class="container">
+                <div class="page-title" style="margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; color: var(--on-surface);">MÓDULO DE PERSONAL</h2>
+                    <p style="color: var(--text-muted); font-family: 'Manrope'; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;">Control de accesos y asignación de credenciales operativas</p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div style="background-color: {% if category == 'error' %}rgba(255, 84, 73, 0.1){% else %}rgba(0, 229, 255, 0.1){% endif %}; color: {% if category == 'error' %}var(--error){% else %}var(--tertiary-cyan){% endif %}; padding: 1rem; margin-bottom: 2rem; font-family: 'Manrope'; font-weight: 700; border-left: 4px solid {% if category == 'error' %}var(--error){% else %}var(--tertiary-cyan){% endif %};">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+                    
+                    <div class="card" style="border-top: 4px solid var(--primary);">
+                        <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; color: var(--on-surface); margin-bottom: 1.5rem; text-transform: uppercase;">Emitir Credencial</h3>
+                        
+                        <form method="POST" action="{{ url_for('gestion_usuarios') }}">
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; display: block; margin-bottom: 5px;">NOMBRE COMPLETO</label>
+                                <input type="text" name="nombre" class="form-input" required placeholder="Nombre del operario">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; display: block; margin-bottom: 5px;">CORREO ELECTRÓNICO (ID DE ACCESO)</label>
+                                <input type="email" name="email" class="form-input" required placeholder="correo@sistema.com">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; display: block; margin-bottom: 5px;">CLAVE DE SEGURIDAD</label>
+                                <input type="password" name="password" class="form-input" required placeholder="••••••••">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 2rem;">
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; display: block; margin-bottom: 5px;">NIVEL DE AUTORIZACIÓN</label>
+                                <select name="rol" class="form-input" required>
+                                    <option value="vendedor">VENDEDOR (Solo mostrador)</option>
+                                    <option value="deposito">DEPÓSITO (Solo logística)</option>
+                                    <option value="encargado">ENCARGADO (Gestión general)</option>
+                                    <option value="admin">ADMINISTRADOR (Control total)</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" name="registrar" class="btn-primary" style="width: 100%;">REGISTRAR OPERARIO</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; color: var(--tertiary-cyan); margin-bottom: 1.5rem; text-transform: uppercase;">Nómina Activa</h3>
+                        
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: var(--surface); font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">
+                                    <th style="padding: 1rem; text-align: left;">Operario</th>
+                                    <th style="padding: 1rem; text-align: left;">ID / Correo</th>
+                                    <th style="padding: 1rem; text-align: center;">Rango</th>
+                                    <th style="padding: 1rem; text-align: center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in usuarios %}
+                                <tr style="border-bottom: 1px solid var(--surface-container-low);">
+                                    <td style="padding: 1rem; font-weight: 700; color: var(--on-surface);">{{ u.nombre|upper }}</td>
+                                    <td style="padding: 1rem; font-family: 'Inter'; font-size: 0.9rem; color: var(--text-muted);">{{ u.email }}</td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <span style="font-family: 'Space Grotesk'; font-size: 0.7rem; font-weight: 700; padding: 4px 8px; 
+                                            background-color: {% if u.rol == 'admin' %}rgba(255, 182, 146, 0.1){% else %}rgba(0, 229, 255, 0.1){% endif %}; 
+                                            color: {% if u.rol == 'admin' %}var(--primary){% else %}var(--tertiary-cyan){% endif %};">
+                                            {{ u.rol|upper }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        {% if u.id != session.get('usuario_id') %}
+                                        <form method="POST" action="{{ url_for('gestion_usuarios') }}" onsubmit="return confirm('¿Confirmar revocación de acceso para {{ u.nombre }}?');">
+                                            <input type="hidden" name="usuario_id" value="{{ u.id }}">
+                                            <button type="submit" name="eliminar" class="btn-tertiary" style="font-size: 0.7rem; padding: 0.5rem 1rem; color: var(--error); border-color: var(--error); width: 100%;">REVOCAR</button>
+                                        </form>
+                                        {% else %}
+                                        <span style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted);">EN USO</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        feather.replace();
+
+        // Lógica del Tema Claro/Oscuro
+        const html = document.documentElement;
+        const saved = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-theme', saved);
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeIcon(saved);
+        });
+
+        function toggleTheme() {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcon = document.querySelector('.icon-sun');
+            const moonIcon = document.querySelector('.icon-moon');
+            if (sunIcon && moonIcon) {
+                sunIcon.style.display = theme === 'light' ? 'block' : 'none';
+                moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
