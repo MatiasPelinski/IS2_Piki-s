@@ -30,6 +30,7 @@ def login():
         cursor.execute('SELECT id, nombre, email, rol FROM usuarios WHERE email = %s AND password = %s', (email, password))
         usuario = cursor.fetchone()
         
+        
         # 3. Cerramos la conexión para liberar memoria (Buena práctica)
         cursor.close()
         conn.close()
@@ -43,9 +44,16 @@ def login():
             # Guardamos el rol en ambas variables para que funcione tanto tu Dashboard 
             # como el nuevo módulo de Gestión de Personal que armamos
             session['usuario_rol'] = usuario['rol']
-            session['rol'] = usuario['rol'] 
+            session['rol'] = usuario['rol']
+             
+            # esto era lo q tirabba el cartelito , miren si les gusta sin o con 
+            #flash(f"Acceso concedido. Rango operativo: {usuario['rol'].upper()}", "success")
             
-            flash(f"Acceso concedido. Rango operativo: {usuario['rol'].upper()}", "success")
+            # Si es empleado, mandalo directo al inventario
+            if usuario['rol'] == 'empleado':
+                return redirect(url_for('productos'))
+            
+            # Otros roles (como administrador) van al dashboard
             return redirect(url_for('dashboard'))
         else:
             flash("Credenciales inválidas. Acceso denegado.", "error")
@@ -59,10 +67,17 @@ def login():
 def dashboard():
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
+    
         
     # 1. Atrapamos los datos del buscador si el usuario escribió algo
     busqueda = request.args.get('busqueda', '')
     categoria_filtro = request.args.get('categoria', '')
+    
+    
+    if session.get('usuario_rol') == 'empleado':
+        return redirect(url_for('productos'))
+    
+    
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
