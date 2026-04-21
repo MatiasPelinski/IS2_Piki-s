@@ -6,6 +6,9 @@ import openpyxl
 import os
 
 app = Flask(__name__)
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
 app.secret_key = 'ferreteria_secret_key'
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
