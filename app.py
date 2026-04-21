@@ -564,7 +564,8 @@ def gestion_usuarios():
         flash("ACCESO DENEGADO: Requiere credenciales de Administrador.", "error")
         return redirect(url_for('dashboard'))
 
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
     # 2. PROCESAMIENTO DE DATOS (Crear o Eliminar)
     if request.method == 'POST':
