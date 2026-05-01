@@ -148,12 +148,17 @@ def productos():
         WHERE p.activo = 1
     '''
     params = []
+    
     if busqueda:
-        query += ' AND p.nombre LIKE %s'
+        # Ahora busca en nombre O descripción
+        query += ' AND (p.nombre LIKE %s OR p.descripcion LIKE %s)'
         params.append(f'%{busqueda}%')
+        params.append(f'%{busqueda}%')
+        
     if categoria_filtro:
         query += ' AND p.id_categoria = %s'
         params.append(categoria_filtro)
+    
     query += ' ORDER BY p.nombre'
     cursor.execute(query, params)
     lista_productos = cursor.fetchall()
@@ -168,6 +173,27 @@ def productos():
                            rol=session['usuario_rol'],
                            busqueda=busqueda,
                            categoria_filtro=categoria_filtro)
+    
+# nuevo a ver
+@app.route('/categorias', methods=['GET', 'POST'])
+def gestion_categorias():
+    if 'usuario_id' not in session or session.get('usuario_rol') != 'encargado':
+        return redirect(url_for('dashboard'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        nombre_cat = request.form['nombre_categoria']
+        cursor.execute('INSERT INTO categorias (nombre, activo) VALUES (%s, 1)', (nombre_cat,))
+        conn.commit()
+        # flash("Categoría agregada con éxito", "success") # Si borraste los flash, podés quitar esta línea
+
+    cursor.execute('SELECT * FROM categorias WHERE activo = 1 ORDER BY nombre')
+    todas_categorias = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('categorias.html', categorias=todas_categorias, nombre=session['usuario_nombre'], rol=session['usuario_rol'])
 
 @app.route('/productos/registrar', methods=['POST'])
 def registrar_producto():
