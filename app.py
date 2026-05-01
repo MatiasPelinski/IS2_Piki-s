@@ -31,7 +31,7 @@ def login():
         usuario = cursor.fetchone()
         
         
-        # 3. Cerramos la conexión para liberar memoria (Buena práctica)
+        # 3. Cerramos la conexión para liberar memoria (
         cursor.close()
         conn.close()
         
