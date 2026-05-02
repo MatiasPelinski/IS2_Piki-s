@@ -1,89 +1,221 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — FerreteriaStock</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=7">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">FerreteriaStock</div>
-        <div class="navbar-user">
-            <span>{{ nombre }}</span>
-            <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
-                <i data-feather="sun" class="icon-sun"></i>
-                <i data-feather="moon" class="icon-moon"></i>
-            </button>
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-sm">Salir</a>
-        </div>
-    </nav>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                FERRETERIASTOCK
+            </div>
 
-    <div class="container">
-        <div class="page-title">
-            <h2>Panel principal</h2>
-            <p>Resumen del sistema de inventario</p>
-        </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link" style="color: var(--primary); background-color: var(--surface-container-highest);">
+                    <i data-feather="grid"></i>
+                    Panel Principal
+                </a>
 
-        <div class="stats-grid">
-            <div class="stat-card stat-blue">
-                <i data-feather="package" class="stat-icon"></i>
-                <div class="stat-number">{{ total_productos }}</div>
-                <div class="stat-label">Productos activos</div>
-            </div>
-            <div class="stat-card stat-orange">
-                <i data-feather="bell" class="stat-icon"></i>
-                <div class="stat-number">{{ total_alertas }}</div>
-                <div class="stat-label">Alertas activas</div>
-            </div>
-            <div class="stat-card stat-red">
-                <i data-feather="alert-triangle" class="stat-icon"></i>
-                <div class="stat-number">{{ total_reponer }}</div>
-                <div class="stat-label">Productos a reponer</div>
-            </div>
-            <div class="stat-card stat-green">
-                <i data-feather="activity" class="stat-icon"></i>
-                <div class="stat-number">{{ movimientos_hoy }}</div>
-                <div class="stat-label">Movimientos hoy</div>
-            </div>
-        </div>
+                <a href="{{ url_for('productos') }}" class="sidebar-link">
+                    <i data-feather="package"></i>
+                    Inventario
+                </a>
 
-        <div class="menu-grid">
-            <a href="{{ url_for('productos') }}" class="menu-card">
-                <i data-feather="package" class="menu-card-icon"></i>
-                <div class="menu-card-title">Productos</div>
-                <div class="menu-card-desc">Registrá y consultá el inventario</div>
-            </a>
-            <a href="{{ url_for('movimientos') }}" class="menu-card">
-                <i data-feather="repeat" class="menu-card-icon"></i>
-                <div class="menu-card-title">Movimientos</div>
-                <div class="menu-card-desc">Entradas, salidas y ajustes de stock</div>
-            </a>
-            <a href="{{ url_for('alertas') }}" class="menu-card">
-                <i data-feather="bell" class="menu-card-icon"></i>
-                <div class="menu-card-title">Alertas y reposición</div>
-                <div class="menu-card-desc">Productos con stock bajo</div>
-            </a>
-            {% if rol == 'encargado' %}
-            <a href="{{ url_for('importar') }}" class="menu-card">
-                <i data-feather="upload" class="menu-card-icon"></i>
-                <div class="menu-card-title">Importar Excel</div>
-                <div class="menu-card-desc">Cargá facturas de proveedores</div>
-            </a>
-            {% endif %}
-        </div>
+                <a href="{{ url_for('movimientos') }}" class="sidebar-link">
+                    <i data-feather="repeat"></i>
+                    Movimientos
+                </a>
+
+                <a href="{{ url_for('alertas') }}" class="sidebar-link">
+                    <i data-feather="bell"></i>
+                    Alertas y Stock
+                </a>
+
+                {% if session.get('usuario_rol') in ['admin', 'encargado'] %}
+                <a href="{{ url_for('importar') }}" class="sidebar-link">
+                    <i data-feather="database"></i>
+                    Reportes Excel
+                </a>
+                {% endif %}
+
+                {% if session.get('usuario_rol') == 'admin' %}
+                <a href="{{ url_for('gestion_usuarios') }}" class="sidebar-link" style="border-left: 3px solid var(--tertiary-cyan);">
+                    <i data-feather="users"></i>
+                    Gestión de Personal
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <span style="font-family: 'Manrope'; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                    USUARIO: {{ nombre }}
+                </span>
+
+                <button class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
+                    <i data-feather="sun" class="icon-sun"></i>
+                    <i data-feather="moon" class="icon-moon"></i>
+                </button>
+
+                <a href="{{ url_for('logout') }}" class="btn-tertiary" style="color: var(--error); border-color: var(--error);">
+                    SALIR
+                </a>
+            </header>
+
+            <div class="container">
+                <div class="card" style="background-color: var(--surface-container-highest);">
+                    <form method="GET" action="{{ url_for('dashboard') }}">
+                        <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                            <div style="flex: 3; min-width: 300px;">
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--tertiary-cyan); letter-spacing: 0.1em; text-transform: uppercase;">
+                                    Búsqueda Técnica
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="busqueda"
+                                    value="{{ busqueda }}"
+                                    placeholder="NOMBRE O SKU..."
+                                    class="form-input"
+                                >
+                            </div>
+
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em;">
+                                    CATEGORÍA
+                                </label>
+
+                                <select name="categoria" class="form-input">
+                                    <option value="">TODAS</option>
+
+                                    {% for cat in categorias %}
+                                    <option value="{{ cat.id }}" {% if categoria_filtro == cat.id|string %}selected{% endif %}>
+                                        {{ cat.nombre|upper }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="height: 52px;">
+                                CONSULTAR
+                            </button>
+
+                            <a href="{{ url_for('dashboard') }}" class="btn-tertiary" style="height: 52px; display: flex; align-items: center;">
+                                LIMPIAR
+                            </a>
+                        </div>
+                    </form>
+
+                    {% if productos_busqueda is not none %}
+                    <div style="margin-top: 2rem; border-top: 2px solid var(--surface); padding-top: 2rem;">
+                        <h3 style="font-family: 'Space Grotesk'; font-size: 0.9rem; color: var(--primary); margin-bottom: 1rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                            Resultados de la Operación
+                        </h3>
+
+                        {% if productos_busqueda %}
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: var(--surface); font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">
+                                    <th style="padding: 1rem; text-align: left;">Artículo</th>
+                                    <th style="padding: 1rem; text-align: right;">Stock</th>
+                                    <th style="padding: 1rem; text-align: right;">Precio</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for p in productos_busqueda %}
+                                <tr style="border-bottom: 1px solid var(--surface-container-low);">
+                                    <td style="padding: 1rem; font-weight: 700;">
+                                        {{ p.nombre|upper }}
+                                    </td>
+
+                                    <td style="padding: 1rem; text-align: right; font-family: 'Manrope'; font-weight: 700; color: {{ 'var(--error)' if p.stock_actual < p.stock_minimo else 'var(--tertiary-cyan)' }};">
+                                        {{ p.stock_actual }}
+                                    </td>
+
+                                    <td style="padding: 1rem; text-align: right; font-family: 'Space Grotesk'; font-weight: 700;">
+                                        ${{ "%.2f"|format(p.precio) }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div style="padding: 1rem; color: var(--error); font-family: 'Space Grotesk';">
+                            NO HAY RESULTADOS.
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; color: var(--on-surface);">
+                        MÉTRICAS DEL SISTEMA
+                    </h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--tertiary-cyan); text-transform: uppercase;">
+                            Stock Activo
+                        </span>
+
+                        <span style="font-family: 'Space Grotesk'; font-size: 3rem; font-weight: 700;">
+                            {{ total_productos }}
+                        </span>
+                    </div>
+
+                    <div class="stat-card">
+                        <span style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--error); text-transform: uppercase;">
+                            Alertas Críticas
+                        </span>
+
+                        <span style="font-family: 'Space Grotesk'; font-size: 3rem; font-weight: 700; color: var(--error);">
+                            {{ total_alertas }}
+                        </span>
+                    </div>
+
+                    <div class="stat-card">
+                        <span style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--primary); text-transform: uppercase;">
+                            Movimientos Hoy
+                        </span>
+
+                        <span style="font-family: 'Space Grotesk'; font-size: 3rem; font-weight: 700;">
+                            {{ movimientos_hoy }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
         feather.replace();
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F2') {
+                event.preventDefault();
+                alert("SISTEMA DE VENTA RÁPIDA ACTIVADO");
+            }
+        });
+
         const html = document.documentElement;
-        const saved = localStorage.getItem('theme') || 'light';
+        const saved = localStorage.getItem('theme') || 'dark';
+
         html.setAttribute('data-theme', saved);
         updateThemeIcon(saved);
 
         function toggleTheme() {
             const current = html.getAttribute('data-theme');
             const next = current === 'light' ? 'dark' : 'light';
+
             html.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             updateThemeIcon(next);
@@ -92,6 +224,7 @@
         function updateThemeIcon(theme) {
             const sunIcon = document.querySelector('.icon-sun');
             const moonIcon = document.querySelector('.icon-moon');
+
             if (sunIcon && moonIcon) {
                 sunIcon.style.display = theme === 'light' ? 'block' : 'none';
                 moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
