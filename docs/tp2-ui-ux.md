@@ -8,7 +8,7 @@ El contexto de uso corresponde a un ambiente comercial con ritmo operativo const
 
 También debe considerarse que no todos los usuarios tendrán conocimientos técnicos avanzados. Por eso, el diseño debe evitar pantallas sobrecargadas, mensajes ambiguos y formularios difíciles de interpretar. Los botones principales deben estar visibles, los campos deben indicar con claridad qué dato se espera ingresar y los mensajes de confirmación o error deben ayudar al usuario a entender qué ocurrió. Una interfaz adecuada para este contexto debe ser simple, consistente y confiable, especialmente porque trabaja con información sensible para el funcionamiento diario del negocio.
 
-````markdown
+
 # A3. Auditoría de usabilidad según ISO 9241-11
 
 La norma ISO 9241-11 define la usabilidad como el grado en que un producto puede ser utilizado por usuarios específicos para alcanzar objetivos específicos con **eficacia**, **eficiencia** y **satisfacción** en un contexto de uso determinado.
