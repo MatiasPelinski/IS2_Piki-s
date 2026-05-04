@@ -76,9 +76,14 @@ Las clases de equivalencia permiten agrupar entradas que deberían producir el m
 | Inválida | La cantidad de salida es negativa | `stock_actual = 10`, `cantidad_salida = -2` | Operación rechazada |
 | Inválida | El stock actual es negativo | `stock_actual = -1`, `cantidad_salida = 1` | Operación rechazada |
 
+## Cómo se aplica para diseñar casos de prueba
+En la práctica, esta técnica se aplica identificando todas las condiciones posibles (válidas e inválidas) y seleccionando un único valor representativo de cada clase para construir un caso de prueba. La premisa es que si el sistema procesa correctamente ese valor, procesará igual de bien cualquier otro valor que pertenezca a la misma clase. Esto permite reducir drásticamente la cantidad total de pruebas a ejecutar sin perder cobertura. Por ejemplo, en un sistema de gestión de inventario, si extraer 5 unidades de un stock de 10 funciona correctamente (clase válida), se asume que no es necesario diseñar pruebas adicionales para extraer 3, 4 o 6 unidades; un solo caso es suficiente para validar toda la condición.
+
 ---
 
 ## 1.4. Valores límite
+
+Un valor límite es aquel dato o entrada que se encuentra exactamente en las fronteras o extremos de una clase de equivalencia. Esto incluye los valores máximos y mínimos permitidos, así como los valores inmediatamente adyacentes a esas fronteras (justo por debajo del mínimo o justo por encima del máximo).
 
 Para un producto con `stock_actual = 10`, los valores límite más relevantes son:
 
@@ -89,6 +94,9 @@ Para un producto con `stock_actual = 10`, los valores límite más relevantes so
 | Justo después del límite | `cantidad_salida = 11` | Rechazado |
 | Límite inferior inválido | `cantidad_salida = 0` | Rechazado |
 | Valor negativo | `cantidad_salida = -1` | Rechazado |
+
+## Cómo se aplica para encontrar defectos
+Se aplica dirigiendo los casos de prueba específicamente a estas fronteras, ya que la experiencia demuestra que la mayoría de los defectos lógicos ocurren en los bordes de las condiciones. Al probar los límites, se busca identificar errores comunes de programación, como el uso incorrecto de operadores relacionales (por ejemplo, usar < en lugar de <=) o los errores de "desplazamiento por uno" (off-by-one errors). Al forzar al sistema a procesar el límite exacto (ej. solicitar 10 unidades cuando el stock es 10) y el primer valor inválido (solicitar 11), los defectos en la lógica condicional quedan expuestos de forma inmediata.
 
 ---
 
