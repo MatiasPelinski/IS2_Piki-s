@@ -273,23 +273,18 @@ def test_registra_entrada_de_stock_con_mock_de_base_de_datos():
 
 ---
 
-## 2.6. Herramientas recomendadas para integración
+## 2.6. Justificación del framework elegido
 
-Se recomienda utilizar:
+Framework seleccionado: pytest
 
-- **pytest**
-- **unittest.mock**
-- **pytest-mock**
-
-### Justificación
-
-Estas herramientas son gratuitas y adecuadas para la pila tecnológica del proyecto porque:
-
-- Funcionan directamente con Python.
-- Permiten simular Supabase sin conectarse realmente.
-- Permiten validar que las funciones externas fueron llamadas correctamente.
-- Son simples de integrar en un proyecto Flask.
-- Facilitan pruebas durante la migración desde MySQL/XAMPP hacia Supabase.
+1. Justificación técnica para el proyecto FerreteriaStock:
+2. Gratuito y de código abierto: sin costo de licencias, ideal para proyecto académico.
+3. 100 % compatible con Python/Flask: el sistema está construido con Flask y Python; pytest se integra naturalmente.
+4. Sintaxis simple basada en assert: no requiere métodos complejos, facilitando la escritura de pruebas por el equipo de desarrollo.
+5. Amplia comunidad y documentación: es el framework más utilizado en el ecosistema Python, con abundantes recursos de aprendizaje.
+6. Soporte para fixtures y mocks: pytest se combina fácilmente con unittest.mock y pytest-mock para simular dependencias externas como Supabase, base de datos o autenticación.
+7. Ejecución rápida: las pruebas unitarias del proyecto corren en milisegundos, lo que favorece su integración en pipelines CI/CD.
+8. Integración directa con GitHub Actions: existen acciones oficiales para Python que instalan dependencias y ejecutan pytest sin configuraciones complejas.
 
 ---
 
