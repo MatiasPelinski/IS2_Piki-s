@@ -273,20 +273,39 @@ def test_registra_entrada_de_stock_con_mock_de_base_de_datos():
 
 ---
 
-## 2.6. Justificación del framework elegido
-
-Framework seleccionado: pytest
-
-1. Justificación técnica para el proyecto FerreteriaStock:
-2. Gratuito y de código abierto: sin costo de licencias, ideal para proyecto académico.
-3. 100 % compatible con Python/Flask: el sistema está construido con Flask y Python; pytest se integra naturalmente.
-4. Sintaxis simple basada en assert: no requiere métodos complejos, facilitando la escritura de pruebas por el equipo de desarrollo.
-5. Amplia comunidad y documentación: es el framework más utilizado en el ecosistema Python, con abundantes recursos de aprendizaje.
-6. Soporte para fixtures y mocks: pytest se combina fácilmente con unittest.mock y pytest-mock para simular dependencias externas como Supabase, base de datos o autenticación.
-7. Ejecución rápida: las pruebas unitarias del proyecto corren en milisegundos, lo que favorece su integración en pipelines CI/CD.
-8. Integración directa con GitHub Actions: existen acciones oficiales para Python que instalan dependencias y ejecutan pytest sin configuraciones complejas.
-
 ---
+
+## B2. Framework de pruebas y automatización CI/CD
+
+### Framework elegido
+
+Se seleccionó **pytest** como framework de pruebas unitarias para el proyecto **FerreteriaStock**.
+
+**Justificación**:
+- Es gratuito y compatible con Python/Flask (stack tecnológico del sistema).
+- Sintaxis sencilla con `assert`, reduciendo la complejidad de las pruebas.
+- Excelente integración con `unittest.mock` para simular servicios externos como Supabase.
+- Rápido en ejecución (6 pruebas en 0.02s), adecuado para pipelines CI/CD.
+- Ampliamente documentado y usado en la industria, lo que facilita el mantenimiento.
+
+### Pipeline CI/CD con GitHub Actions
+
+Se configuró un archivo `.github/workflows/test.yml` que ejecuta automáticamente las pruebas unitarias en cada `push` y `pull request` a las ramas principales (`main`/`master`).
+
+El pipeline realiza los siguientes pasos:
+1. Checkout del repositorio.
+2. Configuración de Python 3.13.
+3. Instalación de dependencias (pytest).
+4. Ejecución de las pruebas con `pytest tests/unit/ --verbose`.
+
+**Resultado esperado**: los tests deben aparecer en verde en la consola de GitHub Actions, proporcionando una validación continua de la integridad del código.
+
+### Evidencia
+
+- **Captura de pantalla**: [Adjuntar captura del workflow ejecutado exitosamente en GitHub Actions]
+- **Video demostrativo**: [Enlace a video en YouTube mostrando los tests en la terminal/IDE pasando en verde]
+
+*(Nota: las evidencias se agregarán una vez obtenidas.)*
 
 ## 2.7. Ubicación sugerida en el repositorio
 
