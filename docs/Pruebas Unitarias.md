@@ -108,6 +108,13 @@ Estos tres valores cubren las fronteras y detectan errores como `>=` en lugar de
 Se aplica dirigiendo los casos de prueba específicamente a estas fronteras, ya que la experiencia demuestra que la mayoría de los defectos lógicos ocurren en los bordes de las condiciones. Al probar los límites, se busca identificar errores comunes de programación, como el uso incorrecto de operadores relacionales (por ejemplo, usar < en lugar de <=) o los errores de "desplazamiento por uno" (off-by-one errors). Al forzar al sistema a procesar el límite exacto (ej. solicitar 10 unidades cuando el stock es 10) y el primer valor inválido (solicitar 11), los defectos en la lógica condicional quedan expuestos de forma inmediata.
 
 ---
+## Ejecución de las pruebas
+
+### Requisitos previos
+
+1. Instalar pytest (si no está instalado):
+   ```bash
+   pip install pytest
 
 ## 1.5. Framework de pruebas unitarias recomendado
 
