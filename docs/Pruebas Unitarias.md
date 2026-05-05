@@ -109,92 +109,7 @@ Se aplica dirigiendo los casos de prueba específicamente a estas fronteras, ya 
 
 ---
 
-## 1.5. Casos de prueba unitaria
-
-### Caso 1 — Salida válida
-
-**Entrada:**
-
-```text
-stock_actual = 10
-cantidad_salida = 5
-```
-
-**Resultado esperado:**
-
-El sistema debe permitir la operación porque existe stock suficiente.
-
----
-
-### Caso 2 — Salida en el límite
-
-**Entrada:**
-
-```text
-stock_actual = 10
-cantidad_salida = 10
-```
-
-**Resultado esperado:**
-
-El sistema debe permitir la operación. El stock queda en cero, pero no se vuelve negativo.
-
----
-
-### Caso 3 — Salida inválida por superar el stock
-
-**Entrada:**
-
-```text
-stock_actual = 10
-cantidad_salida = 11
-```
-
-**Resultado esperado:**
-
-El sistema debe rechazar la operación porque generaría stock negativo.
-
----
-
-## 1.6. Ejemplo de función testeable
-
-```python
-def validar_salida_stock(stock_actual, cantidad_salida):
-    if stock_actual < 0:
-        return False
-
-    if cantidad_salida <= 0:
-        return False
-
-    if cantidad_salida > stock_actual:
-        return False
-
-    return True
-```
-
----
-
-## 1.7. Ejemplo de test unitario con pytest
-
-```python
-from services.stock_service import validar_salida_stock
-
-
-def test_permite_salida_menor_al_stock():
-    assert validar_salida_stock(10, 5) == True
-
-
-def test_permite_salida_igual_al_stock():
-    assert validar_salida_stock(10, 10) == True
-
-
-def test_no_permite_salida_mayor_al_stock():
-    assert validar_salida_stock(10, 11) == False
-```
-
----
-
-## 1.8. Framework de pruebas unitarias recomendado
+## 1.5. Framework de pruebas unitarias recomendado
 
 Para el proyecto se recomienda utilizar **pytest**.
 
@@ -210,14 +125,6 @@ El sistema utiliza principalmente **Python con Flask**, por lo tanto pytest es u
 - Permite combinarse con mocks para simular dependencias externas como Supabase.
 
 La interfaz del sistema está hecha en HTML/CSS, pero la lógica principal se encuentra en Python. Por ese motivo, las pruebas unitarias deben enfocarse principalmente en las funciones del backend.
-
----
-
-## 1.9. Ubicación sugerida en el repositorio
-
-```text
-scr/ferreteria/tests/unit/test_stock_service.py
-```
 
 ---
 
