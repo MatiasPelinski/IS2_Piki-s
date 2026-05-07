@@ -1,4 +1,4 @@
-## Estrategia de Pruebas — FerreteriaStock
+# Estrategia de Pruebas — FerreteriaStock
 
 ## Contexto del proyecto
 
@@ -109,9 +109,9 @@ Se aplica dirigiendo los casos de prueba específicamente a estas fronteras, ya 
 
 ---
 
-## B2. Framework de pruebas y automatización CI/CD
+# B2. Framework de pruebas y automatización CI/CD
 
-### Framework elegido
+## Framework elegido
 
 Se seleccionó **pytest** como framework de pruebas unitarias para el proyecto **FerreteriaStock**.
 
@@ -122,7 +122,7 @@ Se seleccionó **pytest** como framework de pruebas unitarias para el proyecto *
 - Rápido en ejecución (6 pruebas en 0.02s), adecuado para pipelines CI/CD.
 - Ampliamente documentado y usado en la industria, lo que facilita el mantenimiento.
 
-### Pipeline CI/CD con GitHub Actions
+## Pipeline CI/CD con GitHub Actions
 
 Se configuró un archivo `.github/workflows/test.yml` que ejecuta automáticamente las pruebas unitarias en cada `push` y `pull request` a las ramas principales (`main`/`master`).
 
@@ -134,10 +134,15 @@ El pipeline realiza los siguientes pasos:
 
 **Resultado esperado**: los tests deben aparecer en verde en la consola de GitHub Actions, proporcionando una validación continua de la integridad del código.
 
-### Evidencia
+## Evidencia
 
-- **Captura de pantalla**: <img width="1545" height="300" alt="WhatsApp Image 2026-05-07 at 15 02 50" src="https://github.com/user-attachments/assets/b45a05e4-d2c3-43f2-84a7-ed69b76bf1e3" />
-- **Video demostrativo**: https://youtu.be/sWL_zxhJF9s  
+- **Captura de pantalla**:  
+  ![Pipeline CI/CD exitoso](https://github.com/user-attachments/assets/b45a05e4-d2c3-43f2-84a7-ed69b76bf1e3)
+
+- **Video demostrativo**:  
+  [https://youtu.be/sWL_zxhJF9s](https://youtu.be/sWL_zxhJF9s)
+
+---
 
 # B3. Pruebas de Integración
 
@@ -256,67 +261,3 @@ def test_registra_entrada_de_stock_con_mock_de_base_de_datos():
     assert nuevo_stock == 15
     db_mock.actualizar_stock.assert_called_once_with(1, 15)
     db_mock.registrar_movimiento.assert_called_once_with(1, "entrada", 5)
-```
-
----
-
-### Herramienta gratuita para dobles de prueba  
-Se recomienda **`unittest.mock`** (biblioteca estándar de Python).  
-Justificación: no requiere instalación adicional, permite crear mocks y stubs para simular la base de datos MySQL y el sistema de archivos, y se integra perfectamente con `pytest`.
-
----
-
-# Pruebas de estrés planificadas
-
-Las pruebas de estrés no son prioritarias en la etapa actual, pero se planifican para una fase posterior.
-
-El objetivo será evaluar el comportamiento del sistema ante muchas operaciones simultáneas.
-
----
-
-## Escenario propuesto
-
-Simular múltiples consultas y movimientos de stock al mismo tiempo.
-
-Ejemplo:
-
-```text
-500 consultas de productos en pocos minutos
-100 registros de movimientos de stock simultáneos
-50 importaciones de Excel en un período corto
-```
-
----
-
-## Herramienta recomendada
-
-Se recomienda utilizar **Locust**.
-
-### Justificación
-
-Locust es una herramienta gratuita escrita en Python, por lo que se adapta bien al stack del proyecto. Permite simular usuarios concurrentes y medir tiempos de respuesta en endpoints del sistema.
-
----
-
-# Resumen de herramientas elegidas
-
-| Nivel de prueba | Herramienta | Uso en el proyecto | Justificación |
-|----------------|-------------|-------------------|---------------|
-| Unitarias | pytest | Validar reglas de negocio como stock suficiente | Compatible con Flask y simple de usar |
-| Integración | unittest.mock / pytest-mock | Simular Supabase y autenticación | Permite aislar dependencias externas |
-| Componentes | pytest + mocks | Probar módulo de gestión de stock | Valida comportamiento del módulo sin depender de servicios reales |
-| Sistema / E2E | Playwright | Automatizar flujos completos de usuario | Soporta navegación, formularios y carga de archivos |
-| Regresión | GitHub Actions | Ejecutar pruebas automáticamente | Gratuito e integrado con GitHub |
-| Estrés | Locust | Simular carga futura | Compatible con Python y útil para endpoints |
-
----
-
-# Conclusión
-
-La estrategia de pruebas propuesta permite validar el sistema en distintos niveles.
-
-Las pruebas unitarias verifican reglas críticas de negocio, como evitar salidas de stock inválidas. Las pruebas de integración permiten comprobar la comunicación con servicios externos, especialmente Supabase, sin depender de datos reales. Las pruebas de componentes validan módulos más completos, como la gestión de stock, mientras que las pruebas de sistema permiten comprobar flujos completos desde la perspectiva del usuario.
-
-Además, se contempla una estrategia de regresión automatizada con GitHub Actions y una planificación futura de pruebas de estrés con Locust.
-
-Este enfoque permite mejorar la confiabilidad del sistema, reducir errores durante la migración a Supabase y asegurar que las funcionalidades principales sigan funcionando correctamente a medida que el proyecto evoluciona.
