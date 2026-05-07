@@ -34,9 +34,9 @@ El proyecto fue desarrollado inicialmente utilizando **Python Flask**, **HTML/CS
 
 ---
 
-# 1. Pruebas Unitarias
+# B1. Pruebas Unitarias
 
-## 1.1. Módulo o función seleccionada
+## Módulo o función seleccionada
 
 Se selecciona como función concreta a probar:
 
@@ -52,7 +52,7 @@ Esta validación es importante porque el stock es el dato central del sistema. S
 
 ---
 
-## 1.2. Parámetros de entrada
+## Parámetros de entrada
 
 La función recibe dos parámetros principales:
 
@@ -63,7 +63,7 @@ La función recibe dos parámetros principales:
 
 ---
 
-## 1.3. Clases de equivalencia
+## Clases de equivalencia
 
 Las clases de equivalencia permiten agrupar entradas que deberían producir el mismo comportamiento del sistema.
 
@@ -85,7 +85,7 @@ En la práctica, esta técnica se aplica identificando todas las condiciones pos
 
 ---
 
-## 1.4. Valores límite
+## Valores límite
 
 Un valor límite es aquel dato o entrada que se encuentra exactamente en las fronteras o extremos de una clase de equivalencia. Esto incluye los valores máximos y mínimos permitidos, así como los valores inmediatamente adyacentes a esas fronteras (justo por debajo del mínimo o justo por encima del máximo).
 
@@ -139,9 +139,9 @@ El pipeline realiza los siguientes pasos:
 - **Captura de pantalla**: <img width="1545" height="300" alt="WhatsApp Image 2026-05-07 at 15 02 50" src="https://github.com/user-attachments/assets/b45a05e4-d2c3-43f2-84a7-ed69b76bf1e3" />
 - **Video demostrativo**: https://youtu.be/sWL_zxhJF9s  
 
-# 2. Pruebas de Integración
+# B3. Pruebas de Integración
 
-## 2.1. Objetivo
+## Objetivo
 
 Las pruebas de integración verifican que distintos módulos del sistema funcionen correctamente en conjunto.
 
@@ -149,7 +149,7 @@ En este proyecto, son especialmente importantes porque el sistema está migrando
 
 ---
 
-## 2.2. Dependencias externas identificadas
+## Dependencias externas identificadas
 
 ### Dependencia 1 — Supabase Database
 
@@ -183,7 +183,7 @@ Este punto es importante porque ciertas funcionalidades, como importar Excel de 
 
 ---
 
-## 2.3. Uso de mocks y stubs
+## Uso de mocks y stubs
 
 Para probar la integración sin depender de Supabase real, se utilizarán **mocks** y **stubs**.
 
@@ -201,7 +201,7 @@ Esto permite:
 
 ---
 
-## 2.4. Ejemplo de prueba de integración
+## Ejemplo de prueba de integración
 
 ### Caso: registrar una entrada de stock
 
@@ -215,7 +215,7 @@ El flujo esperado es:
 
 ---
 
-## 2.5. Pseudocódigo de prueba de integración
+## Pseudocódigo de prueba de integración
 
 ```python
 from unittest.mock import Mock
@@ -260,59 +260,13 @@ def test_registra_entrada_de_stock_con_mock_de_base_de_datos():
 
 ---
 
-
-
-#### Herramienta de automatización de errores que vamos a utilizar
-
-Playwright es la herramienta más adecuada para este proyecto porque permite automatizar flujos completos como:
-
-- Login.
-- Navegación al dashboard.
-- Consulta de productos.
-- Registro de movimientos.
-- Importación de archivos Excel.
-- Verificación de resultados en pantalla.
-
-Además, permite probar la aplicación en distintos navegadores y simular interacciones reales del usuario, incluyendo carga de archivos. Esto es útil para validar el flujo crítico de importación de Excel de proveedores.
+### Herramienta gratuita para dobles de prueba  
+Se recomienda **`unittest.mock`** (biblioteca estándar de Python).  
+Justificación: no requiere instalación adicional, permite crear mocks y stubs para simular la base de datos MySQL y el sistema de archivos, y se integra perfectamente con `pytest`.
 
 ---
 
-
-## 4.2. Workflow propuesto
-
-```text
-.github/workflows/test.yml
-```
-
----
-
-## 4.3. Activación
-
-El workflow debería ejecutarse en:
-
-- cada `push` hacia la rama principal
-- cada `pull request`
-
----
-
-## 4.4. Pruebas a ejecutar
-
-Inicialmente:
-
-```text
-pytest
-```
-
-A futuro:
-
-```text
-pytest
-playwright test
-```
-
----
-
-# 5. Pruebas de estrés planificadas
+# Pruebas de estrés planificadas
 
 Las pruebas de estrés no son prioritarias en la etapa actual, pero se planifican para una fase posterior.
 
@@ -320,7 +274,7 @@ El objetivo será evaluar el comportamiento del sistema ante muchas operaciones 
 
 ---
 
-## 5.1. Escenario propuesto
+## Escenario propuesto
 
 Simular múltiples consultas y movimientos de stock al mismo tiempo.
 
@@ -334,7 +288,7 @@ Ejemplo:
 
 ---
 
-## 5.2. Herramienta recomendada
+## Herramienta recomendada
 
 Se recomienda utilizar **Locust**.
 
@@ -344,7 +298,7 @@ Locust es una herramienta gratuita escrita en Python, por lo que se adapta bien 
 
 ---
 
-# 6. Resumen de herramientas elegidas
+# Resumen de herramientas elegidas
 
 | Nivel de prueba | Herramienta | Uso en el proyecto | Justificación |
 |----------------|-------------|-------------------|---------------|
