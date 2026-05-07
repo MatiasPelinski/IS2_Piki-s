@@ -137,6 +137,38 @@ La interfaz del sistema está hecha en HTML/CSS, pero la lógica principal se en
 
 Dejo acá el link al video de las pruebas unitarias en la terminal: https://youtu.be/sWL_zxhJF9s  
 
+## B2. Framework de pruebas y automatización CI/CD
+
+### Framework elegido
+
+Se seleccionó **pytest** como framework de pruebas unitarias para el proyecto **FerreteriaStock**.
+
+**Justificación**:
+- Es gratuito y compatible con Python/Flask (stack tecnológico del sistema).
+- Sintaxis sencilla con `assert`, reduciendo la complejidad de las pruebas.
+- Excelente integración con `unittest.mock` para simular servicios externos como Supabase.
+- Rápido en ejecución (6 pruebas en 0.02s), adecuado para pipelines CI/CD.
+- Ampliamente documentado y usado en la industria, lo que facilita el mantenimiento.
+
+### Pipeline CI/CD con GitHub Actions
+
+Se configuró un archivo `.github/workflows/test.yml` que ejecuta automáticamente las pruebas unitarias en cada `push` y `pull request` a las ramas principales (`main`/`master`).
+
+El pipeline realiza los siguientes pasos:
+1. Checkout del repositorio.
+2. Configuración de Python 3.13.
+3. Instalación de dependencias (pytest).
+4. Ejecución de las pruebas con `pytest tests/unit/ --verbose`.
+
+**Resultado esperado**: los tests deben aparecer en verde en la consola de GitHub Actions, proporcionando una validación continua de la integridad del código.
+
+### Evidencia
+
+- **Captura de pantalla**: [Adjuntar captura del workflow ejecutado exitosamente en GitHub Actions]
+- **Video demostrativo**: [Enlace a video en YouTube mostrando los tests en la terminal/IDE pasando en verde]
+
+*(Nota: las evidencias se agregarán una vez obtenidas.)*
+
 # 2. Pruebas de Integración
 
 ## 2.1. Objetivo
@@ -178,23 +210,6 @@ El sistema depende del servicio de autenticación para:
 - Diferenciar acciones permitidas para empleado y encargado.
 
 Este punto es importante porque ciertas funcionalidades, como importar Excel de proveedores o modificar stock, no deberían estar disponibles para cualquier usuario.
-
----
-
-### Dependencia 3 — Archivos Excel de proveedores
-
-El sistema también depende de archivos externos enviados por proveedores.
-
-Estos archivos pueden contener:
-
-- Nombre del proveedor.
-- Fecha.
-- Producto.
-- Cantidad.
-- Precio unitario.
-- Total.
-
-La importación de Excel es una funcionalidad crítica porque puede modificar muchas cantidades de stock en una sola operación.
 
 ---
 
@@ -275,233 +290,7 @@ def test_registra_entrada_de_stock_con_mock_de_base_de_datos():
 
 ---
 
----
-
-## B2. Framework de pruebas y automatización CI/CD
-
-### Framework elegido
-
-Se seleccionó **pytest** como framework de pruebas unitarias para el proyecto **FerreteriaStock**.
-
-**Justificación**:
-- Es gratuito y compatible con Python/Flask (stack tecnológico del sistema).
-- Sintaxis sencilla con `assert`, reduciendo la complejidad de las pruebas.
-- Excelente integración con `unittest.mock` para simular servicios externos como Supabase.
-- Rápido en ejecución (6 pruebas en 0.02s), adecuado para pipelines CI/CD.
-- Ampliamente documentado y usado en la industria, lo que facilita el mantenimiento.
-
-### Pipeline CI/CD con GitHub Actions
-
-Se configuró un archivo `.github/workflows/test.yml` que ejecuta automáticamente las pruebas unitarias en cada `push` y `pull request` a las ramas principales (`main`/`master`).
-
-El pipeline realiza los siguientes pasos:
-1. Checkout del repositorio.
-2. Configuración de Python 3.13.
-3. Instalación de dependencias (pytest).
-4. Ejecución de las pruebas con `pytest tests/unit/ --verbose`.
-
-**Resultado esperado**: los tests deben aparecer en verde en la consola de GitHub Actions, proporcionando una validación continua de la integridad del código.
-
-### Evidencia
-
-- **Captura de pantalla**: [Adjuntar captura del workflow ejecutado exitosamente en GitHub Actions]
-- **Video demostrativo**: [Enlace a video en YouTube mostrando los tests en la terminal/IDE pasando en verde]
-
-*(Nota: las evidencias se agregarán una vez obtenidas.)*
-
-## 2.7. Ubicación sugerida en el repositorio
-
-```text
-scr/ferreteria/tests/integration/test_stock_integration.py
-scr/ferreteria/tests/mocks/
-```
-
----
-
-# 3. Pruebas de Componentes y de Sistema
-
-## 3.1. Pruebas de componentes
-
-### Componente seleccionado
-
-Se selecciona como componente significativo:
-
-**Módulo de gestión de stock**
-
-Este componente es más grande que una función individual, pero no abarca todo el sistema.
-
-Incluye:
-
-- Consulta de productos.
-- Registro de productos.
-- Registro de entradas de stock.
-- Registro de salidas de stock.
-- Actualización de cantidades.
-- Generación de alertas por stock bajo.
-- Importación de Excel de proveedores.
-
----
-
-## 3.2. Prueba del componente de forma aislada
-
-El módulo de gestión de stock puede probarse de forma aislada utilizando una base de datos de prueba o mocks de Supabase.
-
-### Entradas
-
-- Producto existente.
-- Stock actual.
-- Stock mínimo.
-- Tipo de movimiento: entrada, salida o ajuste.
-- Cantidad del movimiento.
-- Motivo del movimiento.
-- Usuario que realiza la acción.
-
----
-
-### Salidas esperadas
-
-El componente debe:
-
-- Actualizar correctamente el stock.
-- Registrar el movimiento.
-- Rechazar salidas inválidas.
-- Generar una alerta si el stock queda por debajo del mínimo.
-- Resolver o mantener alertas según corresponda.
-- Mantener trazabilidad del usuario que realizó la operación.
-
----
-
-## 3.3. Caso de prueba de componente
-
-### Caso: salida de stock que genera alerta
-
-**Datos iniciales:**
-
-```text
-Producto: Martillo
-Stock actual: 6
-Stock mínimo: 5
-Salida solicitada: 3
-```
-
-**Resultado esperado:**
-
-```text
-Nuevo stock: 3
-Movimiento registrado: salida
-Alerta generada: stock bajo
-```
-
-**Validaciones:**
-
-- El producto queda con stock actualizado en 3.
-- Se guarda un movimiento de tipo salida.
-- El motivo queda registrado.
-- El sistema genera una alerta porque `3 < 5`.
-
----
-
-## 3.4. Pruebas de sistema
-
-Las pruebas de sistema validan el comportamiento completo de la aplicación desde la perspectiva del usuario.
-
-En este proyecto, un flujo crítico es:
-
-**Importar archivo Excel de proveedor para actualizar stock**
-
-Este flujo es relevante porque involucra varias partes del sistema:
-
-- Login.
-- Control de permisos.
-- Carga de archivo.
-- Lectura de Excel.
-- Actualización de stock.
-- Registro de movimientos.
-- Actualización de alertas.
-
----
-
-## 3.5. Camino feliz: importar Excel de proveedor
-
-### Paso 1 — Inicio de sesión
-
-El usuario ingresa con credenciales válidas.
-
-**Validaciones:**
-
-- El login es exitoso.
-- El sistema redirige al dashboard.
-- Se muestra el nombre del usuario autenticado.
-
----
-
-### Paso 2 — Acceso al módulo de importación
-
-El usuario accede a la opción de importar Excel de proveedor.
-
-**Validaciones:**
-
-- La pantalla carga correctamente.
-- Se muestra el formulario de carga.
-- Solo el usuario autorizado puede acceder.
-
----
-
-### Paso 3 — Carga del archivo Excel
-
-El usuario selecciona un archivo `.xlsx` con el formato esperado:
-
-```text
-Proveedor | Fecha | Producto | Cantidad | Precio Unitario | Total
-```
-
-**Validaciones:**
-
-- El sistema acepta archivos `.xlsx`.
-- El sistema rechaza archivos con otro formato.
-- El archivo puede leerse correctamente.
-
----
-
-### Paso 4 — Procesamiento del archivo
-
-El sistema procesa cada fila del Excel.
-
-**Validaciones:**
-
-- Si el producto existe, se actualiza el stock.
-- Si el producto no existe, se informa como advertencia.
-- Si la cantidad es inválida, no se actualiza el producto.
-- No se interrumpe todo el proceso por un solo producto incorrecto.
-
----
-
-### Paso 5 — Registro de movimientos
-
-Por cada producto actualizado, se registra un movimiento de entrada.
-
-**Validaciones:**
-
-- El movimiento queda guardado.
-- El tipo de movimiento es `entrada`.
-- El motivo incluye el nombre del proveedor.
-- El movimiento queda asociado al usuario que realizó la importación.
-
----
-
-### Paso 6 — Verificación final
-
-El usuario consulta el inventario actualizado.
-
-**Validaciones:**
-
-- El stock refleja las cantidades importadas.
-- Los movimientos aparecen en el historial.
-- Las alertas se actualizan correctamente.
-
----
-
-## 3.6. Herramientas End-to-End evaluadas
+## Herramientas End-to-End evaluadas
 
 ### Cypress
 
@@ -521,46 +310,6 @@ Cypress es una herramienta moderna para automatizar pruebas en aplicaciones web.
 
 ---
 
-### Playwright
-
-Playwright es una herramienta moderna de automatización E2E desarrollada por Microsoft.
-
-**Ventajas:**
-
-- Soporta Chromium, Firefox y WebKit.
-- Es rápido y estable.
-- Permite probar flujos completos de usuario.
-- Funciona bien con aplicaciones web modernas.
-- Permite simular carga de archivos.
-
-**Desventajas:**
-
-- Puede requerir una configuración inicial un poco mayor que Cypress.
-
----
-
-### Selenium
-
-Selenium es una herramienta clásica de automatización de navegadores.
-
-**Ventajas:**
-
-- Muy flexible.
-- Compatible con muchos lenguajes.
-- Muy conocido en la industria.
-
-**Desventajas:**
-
-- Más complejo de configurar.
-- Más verboso.
-- Menos práctico para un proyecto académico pequeño o mediano.
-
----
-
-### Herramienta E2E elegida
-
-Se recomienda utilizar **Playwright**.
-
 #### Justificación
 
 Playwright es la herramienta más adecuada para este proyecto porque permite automatizar flujos completos como:
@@ -576,25 +325,6 @@ Además, permite probar la aplicación en distintos navegadores y simular intera
 
 ---
 
-# 4. Estrategia de regresión automatizada
-
-Aunque la consigna principal se enfoca en pruebas unitarias, integración, componentes y sistema, se considera importante planificar pruebas de regresión.
-
-Las pruebas de regresión permiten verificar que los cambios realizados en el sistema no rompan funcionalidades ya implementadas.
-
-Esto es especialmente importante en este proyecto porque se está realizando una migración desde XAMPP/MySQL hacia Supabase.
-
----
-
-## 4.1. Herramienta recomendada
-
-**GitHub Actions**
-
-### Justificación
-
-GitHub Actions es gratuito para repositorios públicos y permite ejecutar pruebas automáticamente cada vez que se suben cambios al repositorio.
-
----
 
 ## 4.2. Workflow propuesto
 
