@@ -1,4 +1,4 @@
-# Estrategia de Pruebas — FerreteriaStock
+## Estrategia de Pruebas — FerreteriaStock
 
 ## Contexto del proyecto
 
@@ -134,6 +134,8 @@ El sistema utiliza principalmente **Python con Flask**, por lo tanto pytest es u
 La interfaz del sistema está hecha en HTML/CSS, pero la lógica principal se encuentra en Python. Por ese motivo, las pruebas unitarias deben enfocarse principalmente en las funciones del backend.
 
 ---
+
+Dejo acá el link al video de las pruebas unitarias en la terminal: https://youtu.be/sWL_zxhJF9s  
 
 # 2. Pruebas de Integración
 
