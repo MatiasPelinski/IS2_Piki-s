@@ -260,27 +260,9 @@ def test_registra_entrada_de_stock_con_mock_de_base_de_datos():
 
 ---
 
-## Herramientas End-to-End evaluadas
 
-### Cypress
 
-Cypress es una herramienta moderna para automatizar pruebas en aplicaciones web.
-
-**Ventajas:**
-
-- Fácil de configurar.
-- Buena experiencia visual.
-- Útil para probar formularios y navegación.
-- Sintaxis clara.
-
-**Desventajas:**
-
-- Tiene menor cobertura multi-navegador que Playwright.
-- Puede ser menos flexible para escenarios más complejos.
-
----
-
-#### Justificación
+#### Herramienta de automatización de errores que vamos a utilizar
 
 Playwright es la herramienta más adecuada para este proyecto porque permite automatizar flujos completos como:
 
