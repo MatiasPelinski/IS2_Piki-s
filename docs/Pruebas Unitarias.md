@@ -108,34 +108,6 @@ Estos tres valores cubren las fronteras y detectan errores como `>=` en lugar de
 Se aplica dirigiendo los casos de prueba específicamente a estas fronteras, ya que la experiencia demuestra que la mayoría de los defectos lógicos ocurren en los bordes de las condiciones. Al probar los límites, se busca identificar errores comunes de programación, como el uso incorrecto de operadores relacionales (por ejemplo, usar < en lugar de <=) o los errores de "desplazamiento por uno" (off-by-one errors). Al forzar al sistema a procesar el límite exacto (ej. solicitar 10 unidades cuando el stock es 10) y el primer valor inválido (solicitar 11), los defectos en la lógica condicional quedan expuestos de forma inmediata.
 
 ---
-## Ejecución de las pruebas
-
-### Requisitos previos
-
-1. Instalar pytest (si no está instalado):
-   ```bash
-   pip install pytest
-
-## 1.5. Framework de pruebas unitarias recomendado
-
-Para el proyecto se recomienda utilizar **pytest**.
-
-### Justificación
-
-El sistema utiliza principalmente **Python con Flask**, por lo tanto pytest es una herramienta adecuada porque:
-
-- Es gratuita.
-- Es ampliamente utilizada en proyectos Python.
-- Tiene una sintaxis simple y clara basada en `assert`.
-- Permite probar funciones de negocio sin depender de la interfaz HTML.
-- Puede integrarse con Flask para probar rutas y formularios.
-- Permite combinarse con mocks para simular dependencias externas como Supabase.
-
-La interfaz del sistema está hecha en HTML/CSS, pero la lógica principal se encuentra en Python. Por ese motivo, las pruebas unitarias deben enfocarse principalmente en las funciones del backend.
-
----
-
-Dejo acá el link al video de las pruebas unitarias en la terminal: https://youtu.be/sWL_zxhJF9s  
 
 ## B2. Framework de pruebas y automatización CI/CD
 
@@ -164,10 +136,8 @@ El pipeline realiza los siguientes pasos:
 
 ### Evidencia
 
-- **Captura de pantalla**: [Adjuntar captura del workflow ejecutado exitosamente en GitHub Actions]
-- **Video demostrativo**: [Enlace a video en YouTube mostrando los tests en la terminal/IDE pasando en verde]
-
-*(Nota: las evidencias se agregarán una vez obtenidas.)*
+- **Captura de pantalla**: <img width="1545" height="300" alt="WhatsApp Image 2026-05-07 at 15 02 50" src="https://github.com/user-attachments/assets/b45a05e4-d2c3-43f2-84a7-ed69b76bf1e3" />
+- **Video demostrativo**: https://youtu.be/sWL_zxhJF9s  
 
 # 2. Pruebas de Integración
 
