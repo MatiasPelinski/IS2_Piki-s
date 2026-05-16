@@ -1,3 +1,5 @@
+## --- SECCIÓN 1: Verificación vs Validación ---
+
 **1. Verificación vs Validación**
 
 La diferencia clave es el momento y el objetivo de cada actividad. La verificación responde a la pregunta "¿estamos construyendo el sistema correctamente?", mientras que la validación responde a "¿estamos construyendo el sistema correcto?". En otras palabras, la verificación controla que el producto cumpla con las especificaciones técnicas definidas, y la validación controla que el producto satisfaga las necesidades reales del usuario.
@@ -57,3 +59,15 @@ En una Sprint Review, el Product Owner cumple el rol de representar la voz del c
 En el caso del proyecto, el Product Owner sería quien confirmaría, por ejemplo, que la pantalla de alertas muestra la información suficiente para que el encargado de la ferretería tome decisiones de reposición, o que el flujo de importación de Excel del proveedor funciona de forma comprensible para un usuario sin conocimientos técnicos.
 
 La relación con las pruebas automatizadas es complementaria. Las pruebas automatizadas garantizan que el sistema funciona correctamente desde el punto de vista técnico antes de llegar a la Sprint Review, evitando que el Product Owner encuentre errores básicos durante la demostración. De esta forma, la Sprint Review puede enfocarse en la validación del negocio y no en la detección de bugs, que es responsabilidad del equipo técnico resolver antes de la reunión.
+
+## --- SECCIÓN 2: Planificación de V&V (tabla) ---
+
+Hemos completado la tabla para los próximos 2 sprints (cada sprint = 1 semana real):
+
+| Sprint | Actividad de V&V | Técnica | Responsable | Herramienta |
+| :--- | :--- | :--- | :--- | :--- |
+| **Actual** | Análisis de calidad de código en `app.py` (variables sin usar, complejidad, docstrings). | Análisis estático automatizado | Dev Lead | Pylint |
+| **Actual** | Verificación de la aplicación del patrón *Strategy* en `registrar_movimiento`. | Inspección de código / Revisión de diseño | Dev Lead | Revisión manual |
+| **Próximo** | Inspección de código del módulo de importación de Excel (ruta `/importar` en `app.py`). | Inspección de código (manual) | Dev Lead | Checklist de revisión / IDE |
+| **Próximo** | Prueba del flujo completo de reposición (alerta, subida de Excel, actualización de stock). | Prueba funcional de extremo a extremo (E2E) | QA / Tester | Ejecución manual |
+| **Próximo** | Validación de la información del módulo de alertas con el encargado de la ferretería. | Validación con el usuario / Sprint Review | Product Owner | Entorno de Pruebas / Demo |
