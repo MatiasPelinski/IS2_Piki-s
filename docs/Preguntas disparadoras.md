@@ -1,7 +1,3 @@
-Perfecto. Te respondo cada pregunta con vocabulario profesional, basándome en su proyecto concreto y listo para entregar.
-
----
-
 **1. Verificación vs Validación**
 
 La diferencia clave es el momento y el objetivo de cada actividad. La verificación responde a la pregunta "¿estamos construyendo el sistema correctamente?", mientras que la validación responde a "¿estamos construyendo el sistema correcto?". En otras palabras, la verificación controla que el producto cumpla con las especificaciones técnicas definidas, y la validación controla que el producto satisfaga las necesidades reales del usuario.
