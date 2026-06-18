@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exportación Estadística — FerreteriaStock</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=180">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                FERRETERIASTOCK
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <i data-feather="grid"></i>
+                    Panel Principal
+                </a>
+
+                <a href="{{ url_for('productos') }}" class="sidebar-link">
+                    <i data-feather="package"></i>
+                    Inventario
+                </a>
+
+                <a href="{{ url_for('movimientos') }}" class="sidebar-link">
+                    <i data-feather="repeat"></i>
+                    Movimientos
+                </a>
+
+                <a href="{{ url_for('exportar_movimientos') }}" class="sidebar-link" style="color: var(--primary); background-color: var(--surface-container-highest);">
+                    <i data-feather="download"></i>
+                    Exportación Estadística
+                </a>
+
+                <a href="{{ url_for('alertas') }}" class="sidebar-link">
+                    <i data-feather="bell"></i>
+                    Alertas y Stock
+                </a>
+
+                {% if rol in ['admin', 'encargado'] %}
+                <a href="{{ url_for('importar') }}" class="sidebar-link">
+                    <i data-feather="database"></i>
+                    Reportes Excel
+                </a>
+                {% endif %}
+
+                {% if rol == 'admin' %}
+                <a href="{{ url_for('gestion_usuarios') }}" class="sidebar-link" style="border-left: 3px solid var(--tertiary-cyan);">
+                    <i data-feather="users"></i>
+                    Gestión de Personal
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <span style="font-family: 'Manrope'; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                    USUARIO: {{ nombre }}
+                </span>
+
+                <a href="{{ url_for('logout') }}" class="btn-tertiary" style="color: var(--error); border-color: var(--error);">
+                    SALIR
+                </a>
+
+                <button type="button" class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
+                    <i data-feather="sun" class="icon-sun"></i>
+                    <i data-feather="moon" class="icon-moon"></i>
+                </button>
+            </header>
+
+            <div class="container">
+                <div class="page-title" style="margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem;">
+                        EXPORTACIÓN ESTADÍSTICA
+                    </h2>
+
+                    <p style="font-family: 'Manrope'; color: var(--text-muted); letter-spacing: 0.05em;">
+                        Generá un Excel profesional de movimientos de stock para análisis administrativo y estadístico.
+                    </p>
+                </div>
+
+                {% with mensajes = get_flashed_messages() %}
+                    {% if mensajes %}
+                        {% for mensaje in mensajes %}
+                        <div class="alert" style="margin-bottom: 1.5rem;">
+                            {{ mensaje }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card" style="background-color: var(--surface-container-highest); margin-bottom: 2rem;">
+                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; color: var(--primary); margin-bottom: 1.5rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                        Parámetros del reporte
+                    </h3>
+
+                    <form method="POST" action="{{ url_for('descargar_movimientos_estadistica') }}">
+                        <div style="display: grid; grid-template-columns: repeat(2, minmax(250px, 1fr)); gap: 20px;">
+                            <div>
+                                <label>Fecha desde</label>
+                                <input type="date" name="fecha_desde" class="form-input" value="{{ fecha_desde }}" required>
+                            </div>
+
+                            <div>
+                                <label>Fecha hasta</label>
+                                <input type="date" name="fecha_hasta" class="form-input" value="{{ fecha_hasta }}" required>
+                            </div>
+
+                            <div>
+                                <label>Tipo de movimiento</label>
+                                <select name="tipo_movimiento" class="form-input">
+                                    <option value="todos">TODOS LOS MOVIMIENTOS</option>
+                                    <option value="entrada">ENTRADAS / COMPRAS</option>
+                                    <option value="salida">SALIDAS / VENTAS</option>
+                                    <option value="ajuste">AJUSTES DE STOCK</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label>Categoría</label>
+                                <select name="id_categoria" class="form-input">
+                                    <option value="">TODAS LAS CATEGORÍAS</option>
+
+                                    {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">
+                                        {{ categoria.nombre|upper }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label>Formato de archivo</label>
+                                <select name="formato" class="form-input">
+                                    <option value="xlsx" selected>Excel profesional — Reporte completo</option>
+                                    <option value="csv">CSV — Base plana para Estadística</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; gap: 15px; flex-wrap: wrap;">
+                            <button type="submit" class="btn-primary">
+                                <i data-feather="download"></i>
+                                GENERAR EXCEL PROFESIONAL
+                            </button>
+
+                            <a href="{{ url_for('movimientos') }}" class="btn-tertiary">
+                                VOLVER A MOVIMIENTOS
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--primary); margin-bottom: 2rem;">
+                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; color: var(--primary); margin-bottom: 1.5rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                        Qué contiene el Excel profesional
+                    </h3>
+
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Hoja</th>
+                                <th>Contenido</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td><strong>Resumen Ejecutivo</strong></td>
+                                <td>Indicadores principales, KPIs, totales, importes estimados, lectura general y gráficos.</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Base Completa</strong></td>
+                                <td>Todos los movimientos exportados, con filtros, formato de tabla, encabezados congelados y columnas ajustadas.</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Ventas</strong></td>
+                                <td>Solo movimientos de salida, preparados para analizar demanda y rotación de productos.</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Compras</strong></td>
+                                <td>Solo movimientos de entrada, preparados para analizar reposiciones y abastecimiento.</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Diccionario de Datos</strong></td>
+                                <td>Descripción de cada variable exportada y su utilidad estadística.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--success);">
+                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; color: var(--success); margin-bottom: 1.5rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                        Vinculación con Probabilidad y Estadística
+                    </h3>
+
+                    <p style="margin-bottom: 1rem;">
+                        El archivo exportado permite trabajar con variables cuantitativas y categóricas generadas por el propio sistema Stockeado.
+                    </p>
+
+                    <p style="margin-bottom: 1rem;">
+                        A partir de la base completa se pueden calcular frecuencias, media, mediana, moda, desvío estándar, coeficiente de variación, gráficos, histogramas, regresión, correlación e inferencia estadística.
+                    </p>
+
+                    <p style="margin-bottom: 0;">
+                        Esta mejora transforma los datos operativos del sistema en información útil para la toma de decisiones sobre ventas, compras, reposición y control de inventario.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof feather !== "undefined") {
+                feather.replace();
+            }
+
+            const html = document.documentElement;
+            const savedTheme = localStorage.getItem("theme") || "dark";
+
+            html.setAttribute("data-theme", savedTheme);
+            updateThemeIcon(savedTheme);
+        });
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme") || "dark";
+            const nextTheme = currentTheme === "light" ? "dark" : "light";
+
+            html.setAttribute("data-theme", nextTheme);
+            localStorage.setItem("theme", nextTheme);
+            updateThemeIcon(nextTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcons = document.querySelectorAll(".icon-sun");
+            const moonIcons = document.querySelectorAll(".icon-moon");
+
+            sunIcons.forEach(function (icon) {
+                icon.style.display = theme === "dark" ? "block" : "none";
+            });
+
+            moonIcons.forEach(function (icon) {
+                icon.style.display = theme === "light" ? "block" : "none";
+            });
+        }
+    </script>
+</body>
+</html>

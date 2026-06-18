@@ -4,41 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movimientos — FerreteriaStock</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=10">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=100">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
 </head>
 
 <body>
     <div class="app-layout">
         <aside class="sidebar">
-            <div class="sidebar-header">FERRETERIASTOCK</div>
+            <div class="sidebar-header">
+                FERRETERIASTOCK
+            </div>
 
             <nav class="sidebar-nav">
                 <a href="{{ url_for('dashboard') }}" class="sidebar-link">
-                    <i data-feather="grid"></i> Panel Principal
+                    <i data-feather="grid"></i>
+                    Panel Principal
                 </a>
 
                 <a href="{{ url_for('productos') }}" class="sidebar-link">
-                    <i data-feather="package"></i> Inventario
+                    <i data-feather="package"></i>
+                    Inventario
                 </a>
 
                 <a href="{{ url_for('movimientos') }}" class="sidebar-link" style="color: var(--primary); background-color: var(--surface-container-highest);">
-                    <i data-feather="repeat"></i> Movimientos
+                    <i data-feather="repeat"></i>
+                    Movimientos
+                </a>
+
+                <a href="{{ url_for('exportar_movimientos') }}" class="sidebar-link">
+                    <i data-feather="download"></i>
+                    Exportación Estadística
                 </a>
 
                 <a href="{{ url_for('alertas') }}" class="sidebar-link">
-                    <i data-feather="bell"></i> Alertas y Stock
+                    <i data-feather="bell"></i>
+                    Alertas y Stock
                 </a>
 
                 {% if rol in ['admin', 'encargado'] %}
                 <a href="{{ url_for('importar') }}" class="sidebar-link">
-                    <i data-feather="database"></i> Reportes Excel
+                    <i data-feather="database"></i>
+                    Reportes Excel
                 </a>
                 {% endif %}
 
                 {% if rol == 'admin' %}
                 <a href="{{ url_for('gestion_usuarios') }}" class="sidebar-link" style="border-left: 3px solid var(--tertiary-cyan);">
-                    <i data-feather="users"></i> Gestión de Personal
+                    <i data-feather="users"></i>
+                    Gestión de Personal
                 </a>
                 {% endif %}
             </nav>
@@ -50,32 +64,39 @@
                     USUARIO: {{ nombre }}
                 </span>
 
-                <button class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
-                    <i data-feather="sun" class="icon-sun"></i>
-                    <i data-feather="moon" class="icon-moon"></i>
-                </button>
-
                 <a href="{{ url_for('logout') }}" class="btn-tertiary" style="color: var(--error); border-color: var(--error);">
                     SALIR
                 </a>
+
+                <button type="button" class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
+                    <i data-feather="sun" class="icon-sun"></i>
+                    <i data-feather="moon" class="icon-moon"></i>
+                </button>
             </header>
 
             <div class="container">
-                <div style="margin-bottom: 2rem;">
-                    <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; color: var(--on-surface);">
-                        MOVIMIENTOS DE STOCK
-                    </h2>
+                <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; color: var(--on-surface);">
+                            MOVIMIENTOS DE STOCK
+                        </h2>
 
-                    <p style="font-family: 'Manrope'; color: var(--text-muted); letter-spacing: 0.05em;">
-                        Registrá entradas, salidas y ajustes del inventario.
-                    </p>
+                        <p style="font-family: 'Manrope'; color: var(--text-muted); letter-spacing: 0.05em;">
+                            Registrá entradas, salidas y ajustes del inventario.
+                        </p>
+                    </div>
+
+                    <a href="{{ url_for('exportar_movimientos') }}" class="btn-primary">
+                        <i data-feather="download"></i>
+                        EXPORTAR PARA ESTADÍSTICA
+                    </a>
                 </div>
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                        <div style="background-color: {% if category == 'error' %}rgba(255, 84, 73, 0.1){% else %}rgba(0, 229, 255, 0.1){% endif %}; color: {% if category == 'error' %}var(--error){% else %}var(--tertiary-cyan){% endif %}; padding: 1rem; margin-bottom: 2rem; font-family: 'Manrope'; font-weight: 700; border-left: 4px solid {% if category == 'error' %}var(--error){% else %}var(--tertiary-cyan){% endif %};">
-                            {{ message }}
+                {% with mensajes = get_flashed_messages() %}
+                    {% if mensajes %}
+                        {% for mensaje in mensajes %}
+                        <div class="alert" style="margin-bottom: 1.5rem;">
+                            {{ mensaje }}
                         </div>
                         {% endfor %}
                     {% endif %}
@@ -97,7 +118,7 @@
                                     <option value="">SELECCIONAR PRODUCTO</option>
 
                                     {% for p in productos %}
-                                    <option value="{{ p.id }}" {% if selected_producto_id and selected_producto_id|string == p.id|string %}selected{% endif %}>
+                                    <option value="{{ p.id }}">
                                         {{ p.nombre|upper }} — STOCK: {{ p.stock_actual }}
                                     </option>
                                     {% endfor %}
@@ -122,7 +143,14 @@
                                     Cantidad
                                 </label>
 
-                                <input type="number" name="cantidad" min="1" required placeholder="CANTIDAD..." class="form-input">
+                                <input
+                                    type="number"
+                                    name="cantidad"
+                                    min="1"
+                                    required
+                                    placeholder="CANTIDAD..."
+                                    class="form-input"
+                                >
                             </div>
 
                             <div>
@@ -130,7 +158,13 @@
                                     Motivo
                                 </label>
 
-                                <input type="text" name="motivo" required placeholder="EJ: COMPRA A PROVEEDOR, VENTA, AJUSTE..." class="form-input">
+                                <input
+                                    type="text"
+                                    name="motivo"
+                                    required
+                                    placeholder="EJ: COMPRA A PROVEEDOR, VENTA, AJUSTE..."
+                                    class="form-input"
+                                >
                             </div>
                         </div>
 
@@ -147,9 +181,16 @@
                 </div>
 
                 <div class="card" style="background-color: var(--surface-container-highest);">
-                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; color: var(--primary); margin-bottom: 1.5rem; letter-spacing: 0.08em; text-transform: uppercase;">
-                        Historial de movimientos
-                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                        <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; color: var(--primary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0;">
+                            Historial de movimientos
+                        </h3>
+
+                        <a href="{{ url_for('exportar_movimientos') }}" class="btn-tertiary">
+                            <i data-feather="download"></i>
+                            EXPORTAR HISTORIAL
+                        </a>
+                    </div>
 
                     {% if movimientos %}
                     <table style="width: 100%; border-collapse: collapse;">
@@ -159,6 +200,8 @@
                                 <th style="padding: 1rem; text-align: left;">Producto</th>
                                 <th style="padding: 1rem; text-align: left;">Tipo</th>
                                 <th style="padding: 1rem; text-align: right;">Cantidad</th>
+                                <th style="padding: 1rem; text-align: right;">Stock anterior</th>
+                                <th style="padding: 1rem; text-align: right;">Stock posterior</th>
                                 <th style="padding: 1rem; text-align: left;">Motivo</th>
                                 <th style="padding: 1rem; text-align: left;">Usuario</th>
                             </tr>
@@ -181,16 +224,38 @@
 
                                 <td style="padding: 1rem;">
                                     {% if m.tipo == 'entrada' %}
-                                    <span style="color: var(--tertiary-cyan); font-family: 'Manrope'; font-weight: 700;">ENTRADA</span>
+                                        <span style="color: var(--tertiary-cyan); font-family: 'Manrope'; font-weight: 700;">
+                                            ENTRADA
+                                        </span>
                                     {% elif m.tipo == 'salida' %}
-                                    <span style="color: var(--error); font-family: 'Manrope'; font-weight: 700;">SALIDA</span>
+                                        <span style="color: var(--error); font-family: 'Manrope'; font-weight: 700;">
+                                            SALIDA
+                                        </span>
                                     {% else %}
-                                    <span style="color: var(--primary); font-family: 'Manrope'; font-weight: 700;">AJUSTE</span>
+                                        <span style="color: var(--primary); font-family: 'Manrope'; font-weight: 700;">
+                                            AJUSTE
+                                        </span>
                                     {% endif %}
                                 </td>
 
                                 <td style="padding: 1rem; text-align: right; font-family: 'Space Grotesk'; font-weight: 700;">
                                     {{ m.cantidad }}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: right; font-family: 'Space Grotesk'; color: var(--text-muted);">
+                                    {% if m.stock_anterior is not none %}
+                                        {{ m.stock_anterior }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: right; font-family: 'Space Grotesk'; font-weight: 700;">
+                                    {% if m.stock_posterior is not none %}
+                                        {{ m.stock_posterior }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
                                 </td>
 
                                 <td style="padding: 1rem; color: var(--text-muted);">
@@ -204,6 +269,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
+
                     {% else %}
                     <div style="padding: 1rem; color: var(--text-muted); font-family: 'Space Grotesk';">
                         NO HAY MOVIMIENTOS REGISTRADOS.
@@ -215,19 +281,39 @@
     </div>
 
     <script>
-        feather.replace();
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof feather !== "undefined") {
+                feather.replace();
+            }
 
-        const html = document.documentElement;
-        const saved = localStorage.getItem('theme') || 'dark';
+            const html = document.documentElement;
+            const savedTheme = localStorage.getItem("theme") || "dark";
 
-        html.setAttribute('data-theme', saved);
+            html.setAttribute("data-theme", savedTheme);
+            updateThemeIcon(savedTheme);
+        });
 
         function toggleTheme() {
-            const current = html.getAttribute('data-theme');
-            const next = current === 'light' ? 'dark' : 'light';
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme") || "dark";
+            const nextTheme = currentTheme === "light" ? "dark" : "light";
 
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
+            html.setAttribute("data-theme", nextTheme);
+            localStorage.setItem("theme", nextTheme);
+            updateThemeIcon(nextTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcons = document.querySelectorAll(".icon-sun");
+            const moonIcons = document.querySelectorAll(".icon-moon");
+
+            sunIcons.forEach(function (icon) {
+                icon.style.display = theme === "dark" ? "block" : "none";
+            });
+
+            moonIcons.forEach(function (icon) {
+                icon.style.display = theme === "light" ? "block" : "none";
+            });
         }
     </script>
 </body>

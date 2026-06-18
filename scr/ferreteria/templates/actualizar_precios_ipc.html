@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Precios por IPC — FerreteriaStock</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=330">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                FERRETERIASTOCK
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+                    <i data-feather="grid"></i>
+                    Panel Principal
+                </a>
+
+                <a href="{{ url_for('productos') }}" class="sidebar-link" style="color: var(--primary); background-color: var(--surface-container-highest);">
+                    <i data-feather="package"></i>
+                    Inventario
+                </a>
+
+                <a href="{{ url_for('movimientos') }}" class="sidebar-link">
+                    <i data-feather="repeat"></i>
+                    Movimientos
+                </a>
+
+                <a href="{{ url_for('exportar_movimientos') }}" class="sidebar-link">
+                    <i data-feather="download"></i>
+                    Exportación Estadística
+                </a>
+
+                <a href="{{ url_for('alertas') }}" class="sidebar-link">
+                    <i data-feather="bell"></i>
+                    Alertas y Stock
+                </a>
+
+                {% if rol in ['admin', 'encargado'] %}
+                <a href="{{ url_for('importar') }}" class="sidebar-link">
+                    <i data-feather="database"></i>
+                    Reportes Excel
+                </a>
+                {% endif %}
+
+                {% if rol == 'admin' %}
+                <a href="{{ url_for('gestion_usuarios') }}" class="sidebar-link">
+                    <i data-feather="users"></i>
+                    Gestión de Personal
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <span style="font-family: 'Manrope'; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                    USUARIO: {{ nombre }}
+                </span>
+
+                <a href="{{ url_for('logout') }}" class="btn-tertiary" style="color: var(--error); border-color: var(--error);">
+                    SALIR
+                </a>
+
+                <button type="button" class="theme-toggle btn-tertiary" onclick="toggleTheme()" title="Cambiar tema">
+                    <i data-feather="sun" class="icon-sun"></i>
+                    <i data-feather="moon" class="icon-moon"></i>
+                </button>
+            </header>
+
+            <div class="container">
+                <div style="margin-bottom: 2rem;">
+                    <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; color: var(--on-surface);">
+                        ACTUALIZAR PRECIOS POR IPC
+                    </h2>
+
+                    <p style="color: var(--text-muted); font-family: 'Manrope'; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;">
+                        Actualización masiva de precios según Índice de Precios al Consumidor
+                    </p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div style="
+                            background-color: {% if category == 'error' %}rgba(255, 84, 73, 0.12){% else %}rgba(0, 229, 255, 0.12){% endif %};
+                            color: {% if category == 'error' %}var(--error){% else %}var(--tertiary-cyan){% endif %};
+                            padding: 1rem;
+                            margin-bottom: 2rem;
+                            border-left: 4px solid {% if category == 'error' %}var(--error){% else %}var(--tertiary-cyan){% endif %};
+                            font-family: 'Manrope';
+                            font-weight: 700;
+                        ">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card" style="border-top: 4px solid var(--primary); margin-bottom: 2rem;">
+                    <h3 style="font-family: 'Space Grotesk'; color: var(--primary); margin-bottom: 1rem; text-transform: uppercase;">
+                        Parámetros de actualización
+                    </h3>
+
+                    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                        Ingresá el porcentaje de IPC correspondiente al período. El sistema calculará automáticamente el nuevo precio de los productos activos que tengan un precio base mayor a cero.
+                    </p>
+
+                    <div style="background-color: var(--surface); border: 1px solid var(--surface-container-low); padding: 1rem; margin-bottom: 1.5rem; border-radius: 10px;">
+                        <strong style="color: var(--primary);">Fórmula utilizada:</strong>
+                        <span style="color: var(--on-surface); margin-left: 0.5rem;">
+                            Nuevo Precio = Precio Actual × (1 + IPC / 100)
+                        </span>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('ipc.actualizar_precios_ipc') }}">
+                        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: end;">
+                            <div>
+                                <label style="font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; display: block; margin-bottom: 5px;">
+                                    PORCENTAJE DE IPC
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    max="100"
+                                    name="porcentaje_ipc"
+                                    class="form-input"
+                                    required
+                                    placeholder="Ejemplo: 3.5"
+                                    value="{{ porcentaje_ipc }}"
+                                >
+                            </div>
+
+                            <button type="submit" name="previsualizar" class="btn-primary">
+                                PREVISUALIZAR
+                            </button>
+
+                            <a href="{{ url_for('productos') }}" class="btn-tertiary" style="display: flex; align-items: center; justify-content: center;">
+                                VOLVER
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-label">Productos activos</div>
+                        <div class="stat-value">{{ resumen.productos_activos }}</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">Con precio válido</div>
+                        <div class="stat-value">{{ resumen.productos_con_precio }}</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label" style="color: var(--error);">Sin precio base</div>
+                        <div class="stat-value" style="color: var(--error);">{{ resumen.productos_sin_precio }}</div>
+                    </div>
+                </div>
+
+                {% if productos_sin_precio %}
+                <div class="card" style="border-top: 4px solid var(--error); margin-bottom: 2rem;">
+                    <h3 style="font-family: 'Space Grotesk'; color: var(--error); margin-bottom: 1rem; text-transform: uppercase;">
+                        Productos pendientes de precio base
+                    </h3>
+
+                    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+                        Estos productos tienen precio igual a cero. No serán actualizados por IPC porque cualquier porcentaje aplicado sobre cero sigue dando cero. Primero deben cargarse con un precio base desde el módulo de inventario o mediante una carga inicial de precios.
+                    </p>
+
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: var(--surface); font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">
+                                <th style="padding: 1rem; text-align: left;">Producto</th>
+                                <th style="padding: 1rem; text-align: left;">Categoría</th>
+                                <th style="padding: 1rem; text-align: right;">Precio actual</th>
+                                <th style="padding: 1rem; text-align: center;">Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for producto in productos_sin_precio %}
+                            <tr style="border-bottom: 1px solid var(--surface-container-low);">
+                                <td style="padding: 1rem; font-weight: 700;">
+                                    {{ producto.nombre|upper }}
+                                </td>
+
+                                <td style="padding: 1rem; color: var(--text-muted);">
+                                    {{ producto.categoria_nombre }}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: right; color: var(--error); font-weight: 700;">
+                                    $ {{ "%.2f"|format(producto.precio) }}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: center;">
+                                    <span style="color: var(--error); font-weight: 700;">
+                                        REQUIERE PRECIO BASE
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                {% if resumen.porcentaje_ipc %}
+                <div class="card" style="border-top: 4px solid var(--tertiary-cyan); margin-bottom: 2rem;">
+                    <h3 style="font-family: 'Space Grotesk'; color: var(--tertiary-cyan); margin-bottom: 1.5rem; text-transform: uppercase;">
+                        Resumen de la actualización
+                    </h3>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">IPC ingresado</div>
+                            <div class="stat-value">{{ resumen.porcentaje_ipc }}%</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">Productos a actualizar</div>
+                            <div class="stat-value">{{ resumen.productos_actualizados }}</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">Total anterior</div>
+                            <div class="stat-value">$ {{ "%.2f"|format(resumen.precio_total_anterior) }}</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">Total actualizado</div>
+                            <div class="stat-value">$ {{ "%.2f"|format(resumen.precio_total_nuevo) }}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding: 1rem; background-color: rgba(255, 84, 73, 0.08); border-left: 4px solid var(--error); color: var(--text-muted);">
+                        <strong style="color: var(--error);">Atención:</strong>
+                        al confirmar, se actualizarán los precios reales de todos los productos activos con precio base mayor a cero.
+                    </div>
+
+                    {% if vista_previa %}
+                    <form method="POST" action="{{ url_for('ipc.actualizar_precios_ipc') }}" style="margin-top: 2rem;">
+                        <input type="hidden" name="porcentaje_ipc" value="{{ resumen.porcentaje_ipc }}">
+
+                        <button type="submit" name="confirmar_actualizacion" class="btn-primary" style="width: 100%;">
+                            CONFIRMAR Y APLICAR ACTUALIZACIÓN MASIVA
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if vista_previa %}
+                <div class="card" style="background-color: var(--surface-container-highest); margin-bottom: 2rem;">
+                    <h3 style="font-family: 'Space Grotesk'; color: var(--on-surface); margin-bottom: 1.5rem; text-transform: uppercase;">
+                        Vista previa de precios actualizados
+                    </h3>
+
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: var(--surface); font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                                <th style="padding: 1rem; text-align: left;">Producto</th>
+                                <th style="padding: 1rem; text-align: left;">Categoría</th>
+                                <th style="padding: 1rem; text-align: right;">Precio anterior</th>
+                                <th style="padding: 1rem; text-align: right;">Precio nuevo</th>
+                                <th style="padding: 1rem; text-align: right;">Diferencia</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for fila in vista_previa %}
+                            <tr style="border-bottom: 1px solid var(--surface-container-low);">
+                                <td style="padding: 1rem; font-weight: 700;">
+                                    {{ fila.nombre|upper }}
+                                </td>
+
+                                <td style="padding: 1rem; color: var(--text-muted);">
+                                    {{ fila.categoria_nombre }}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: right;">
+                                    $ {{ "%.2f"|format(fila.precio_anterior) }}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: right; font-weight: 700; color: var(--tertiary-cyan);">
+                                    $ {{ "%.2f"|format(fila.precio_nuevo) }}
+                                </td>
+
+                                <td style="padding: 1rem; text-align: right; color: var(--success); font-weight: 700;">
+                                    + $ {{ "%.2f"|format(fila.diferencia) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <h3 style="font-family: 'Space Grotesk'; color: var(--primary); margin-bottom: 1.5rem; text-transform: uppercase;">
+                        Historial de actualizaciones por IPC
+                    </h3>
+
+                    {% if historial %}
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: var(--surface); font-family: 'Manrope'; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">
+                                <th style="padding: 1rem; text-align: left;">Fecha</th>
+                                <th style="padding: 1rem; text-align: left;">Usuario</th>
+                                <th style="padding: 1rem; text-align: right;">IPC</th>
+                                <th style="padding: 1rem; text-align: right;">Productos</th>
+                                <th style="padding: 1rem; text-align: right;">Total anterior</th>
+                                <th style="padding: 1rem; text-align: right;">Total nuevo</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in historial %}
+                            <tr style="border-bottom: 1px solid var(--surface-container-low);">
+                                <td style="padding: 1rem;">{{ item.fecha_actualizacion }}</td>
+                                <td style="padding: 1rem;">{{ item.usuario_nombre }}</td>
+                                <td style="padding: 1rem; text-align: right;">{{ item.porcentaje_ipc }}%</td>
+                                <td style="padding: 1rem; text-align: right;">{{ item.productos_actualizados }}</td>
+                                <td style="padding: 1rem; text-align: right;">$ {{ "%.2f"|format(item.precio_total_anterior) }}</td>
+                                <td style="padding: 1rem; text-align: right;">$ {{ "%.2f"|format(item.precio_total_nuevo) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div style="padding: 1.5rem; color: var(--text-muted); font-family: 'Space Grotesk';">
+                        TODAVÍA NO HAY ACTUALIZACIONES REGISTRADAS.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof feather !== "undefined") {
+                feather.replace();
+            }
+
+            const html = document.documentElement;
+            const savedTheme = localStorage.getItem("theme") || "dark";
+
+            html.setAttribute("data-theme", savedTheme);
+            updateThemeIcon(savedTheme);
+        });
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme") || "dark";
+            const nextTheme = currentTheme === "light" ? "dark" : "light";
+
+            html.setAttribute("data-theme", nextTheme);
+            localStorage.setItem("theme", nextTheme);
+            updateThemeIcon(nextTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const sunIcons = document.querySelectorAll(".icon-sun");
+            const moonIcons = document.querySelectorAll(".icon-moon");
+
+            sunIcons.forEach(function (icon) {
+                icon.style.display = theme === "dark" ? "block" : "none";
+            });
+
+            moonIcons.forEach(function (icon) {
+                icon.style.display = theme === "light" ? "block" : "none";
+            });
+        }
+    </script>
+</body>
+</html>

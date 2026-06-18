@@ -1,0 +1,9 @@
+
+.env
+**/.env
+logs/
+uploads/
+scr/ferreteria/logs/
+scr/ferreteria/uploads/
+__pycache__/
+*.pyc
